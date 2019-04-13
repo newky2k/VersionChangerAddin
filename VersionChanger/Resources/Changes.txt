@@ -1,0 +1,7 @@
+﻿Changes in 2.0.2
+
+- Improved detection of unloaded projects, to reduce false positives
+- Fixed hanging issue when nodes are missing from the AssemblyInfo.cs file within a project
+- Added warning Notice when projects can be loaded
+  - You can also see the projects and errors
+- Improved look and feel of the notifcation banner

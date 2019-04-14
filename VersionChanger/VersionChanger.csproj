@@ -79,6 +79,7 @@
     <Compile Include="Data\SolutionProcessor.cs" />
     <Compile Include="Enums\AppType.cs" />
     <Compile Include="Enums\plistType.cs" />
+    <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Guids.cs" />
     <Compile Include="PkgCmdID.cs" />
@@ -197,6 +198,7 @@
       <SubType>Designer</SubType>
     </Page>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(VSToolsPath)\VSSDK\Microsoft.VsSDK.targets" Condition="'$(VSToolsPath)' != ''" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

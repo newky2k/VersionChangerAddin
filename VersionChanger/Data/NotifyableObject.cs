@@ -3,8 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Runtime.CompilerServices;
 
 namespace DSoft.VersionChanger.Data
 {
@@ -30,12 +29,9 @@ namespace DSoft.VersionChanger.Data
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
         public event EventHandler<DataErrorsChangedEventArgs> ErrorsChanged = delegate { };
 
-        protected void PropertyDidChange(string prop)
+        protected void PropertyDidChange([CallerMemberName]string prop = null)
         {
-            if (PropertyChanged != null)
-            {
-                PropertyChanged(this, new PropertyChangedEventArgs(prop));
-            }
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(prop));
         }
 
         protected void ErrorDidChange(string prop)

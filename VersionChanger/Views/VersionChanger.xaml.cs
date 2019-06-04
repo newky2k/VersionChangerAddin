@@ -67,5 +67,10 @@ namespace DSoft.VersionChanger.Views
         {
            
         }
+
+        private void FilterClick(object sender, RoutedEventArgs e)
+        {
+            mViewModel.FilterProjects();
+        }
     }
 }

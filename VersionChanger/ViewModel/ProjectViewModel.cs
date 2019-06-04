@@ -585,33 +585,37 @@ namespace DSoft.VersionChanger.ViewModel
 
                             }
 
-                            if (ver.IsCocoa == true)
+                            if (ver.SecondaryProjectItem != null)
                             {
-                                var secFile = ver.SecondaryProjectItem.FileNames[0];
-
-                                var aUpdater = new CocoaAppVersion()
+                                if (ver.IsCocoa == true)
                                 {
-                                    FilePath = secFile
-                                };
+                                    var secFile = ver.SecondaryProjectItem.FileNames[0];
 
-                                aUpdater.VersionOne = cocoaShortVersion;
-                                aUpdater.VersionTwo = newVersionValue;
-                                aUpdater.Update();
+                                    var aUpdater = new CocoaAppVersion()
+                                    {
+                                        FilePath = secFile
+                                    };
 
-                            }
-                            else if (ver.IsAndroid == true)
-                            {
-                                var secFile = ver.SecondaryProjectItem.FileNames[0];
+                                    aUpdater.VersionOne = cocoaShortVersion;
+                                    aUpdater.VersionTwo = newVersionValue;
+                                    aUpdater.Update();
 
-                                var aUpdater = new AndroidAppVersion()
+                                }
+                                else if (ver.IsAndroid == true)
                                 {
-                                    FilePath = secFile
-                                };
+                                    var secFile = ver.SecondaryProjectItem.FileNames[0];
 
-                                aUpdater.VersionOne = androidBuild;
-                                aUpdater.VersionTwo = newVersionValue;
-                                aUpdater.Update();
+                                    var aUpdater = new AndroidAppVersion()
+                                    {
+                                        FilePath = secFile
+                                    };
+
+                                    aUpdater.VersionOne = androidBuild;
+                                    aUpdater.VersionTwo = newVersionValue;
+                                    aUpdater.Update();
+                                }
                             }
+
                         }
                     }
                 }

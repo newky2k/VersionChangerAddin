@@ -1,4 +1,8 @@
-﻿Changes in 2.0.2
+﻿Changes in 2.2.0
+ - Fixed issues with processing AssemblyInfo.cs where there were gaps
+ - Fixed issue with processing Android projects without manifest.xml files
+
+Changes in 2.0.2
 
 - Improved detection of unloaded projects, to reduce false positives
 - Fixed hanging issue when nodes are missing from the AssemblyInfo.cs file within a project

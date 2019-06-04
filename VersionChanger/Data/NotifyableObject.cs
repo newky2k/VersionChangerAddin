@@ -5,7 +5,8 @@ using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 
-namespace DSoft.VersionChanger.Data {
+namespace DSoft.VersionChanger.Data
+{
     public class NotifyableObject : INotifyPropertyChanged, INotifyDataErrorInfo
     {
         private Dictionary<string, string> _errors = new Dictionary<string, string>();

@@ -93,6 +93,19 @@ namespace DSoft.VersionChanger.Data
                             }
 
                             projectItem = FindAssemblyInfoProjectItem(proj.ProjectItems);
+
+                            if (projectItem == null)
+                            {
+                                var newFailedProject = new FailedProject()
+                                {
+                                    Name = proj.Name,
+                                    Reason = Enum.FailureReason.MissingAssemblyInfo,
+                                };
+
+                                FailedProjects.Add(newFailedProject);
+                            }
+
+                            continue;
                         }
                         else
                         {

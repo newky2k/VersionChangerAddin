@@ -60,6 +60,7 @@
     <Compile Include="Data\AndroidAppVersion.cs" />
     <Compile Include="Data\AppVersion.cs" />
     <Compile Include="Data\CocoaAppVersion.cs" />
+    <Compile Include="Data\Enum\FailureReason.cs" />
     <Compile Include="Data\FailedProject.cs" />
     <Compile Include="Data\iOSAppVersion.cs" />
     <Compile Include="Data\LanguageType.cs" />

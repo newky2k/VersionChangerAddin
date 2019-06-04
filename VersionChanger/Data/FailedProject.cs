@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DSoft.VersionChanger.Data.Enum;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -14,10 +15,16 @@ namespace DSoft.VersionChanger.Data
 
         public bool FailedAssemblyFileVersion { get; set; }
 
+        public FailureReason Reason { get; set; }
+
+
         public string ErrorMessage
         {
             get
             {
+                if (Reason == FailureReason.MissingAssemblyInfo)
+                    return "AssemblyInfo.cs can not be found";
+
                 if (FailedAssemblyVersion == true && FailedAssemblyFileVersion == true)
                 {
                     return "Unable to load the AssemblyVersion and AssemblyFileVersion from the AssemblyInfo.cs file";

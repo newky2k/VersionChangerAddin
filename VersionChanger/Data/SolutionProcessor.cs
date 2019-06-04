@@ -177,8 +177,9 @@ namespace DSoft.VersionChanger.Data
             var endPpint = editDoc.EndPoint.CreateEditPoint();
             endPpint.EndOfDocument();
 
-            string searchText = "AssemblyVersion(\"";
-            string searchText2 = "AssemblyFileVersion(\"";
+            string searchText = "AssemblyVersion";
+            string searchText2 = "AssemblyFileVersion";
+            string searchVstart = "(\"";
 
             //if the file version is null, as seperate version have not been set
             if (newFileVersion == null)
@@ -204,8 +205,16 @@ namespace DSoft.VersionChanger.Data
                     {
                         //now get the version number
                         int locationStart = aLine.IndexOf(searchText);
-                        string firstBit = aLine.Substring(0, (locationStart + searchText.Length));
-                        string remaining = aLine.Substring((locationStart + searchText.Length));
+                        var searchLength = searchText.Length;
+
+                        string initail = aLine.Substring((locationStart + searchText.Length));
+                        var openerlocationStart = initail.IndexOf(searchVstart);
+
+                        searchLength += (openerlocationStart + searchVstart.Length);
+                        //locationStart += openerlocationStart;
+
+                        string firstBit = aLine.Substring(0, (locationStart + searchLength));
+                        string remaining = aLine.Substring((locationStart + searchLength));
                         int locationEnd = remaining.IndexOf("\"");
                         string end = remaining.Substring(locationEnd);
 
@@ -214,7 +223,7 @@ namespace DSoft.VersionChanger.Data
 
                         var newLine = String.Format("{0}{1}{2}", firstBit, newVersionValue, end);
 
-                        objEditPt.ReplaceText(objEditPt.LineLength, newLine, (int)vsEPReplaceTextOptions.vsEPReplaceTextAutoformat);
+                        objEditPt.ReplaceText(objEditPt.LineLength, newLine, (int)vsEPReplaceTextOptions.vsEPReplaceTextKeepMarkers);
 
                         var aLine2 = objEditPt.GetText(objEditPt.LineLength);
 
@@ -226,8 +235,15 @@ namespace DSoft.VersionChanger.Data
                     if (aLine.Contains(searchText2))
                     {
                         int locationStart = aLine.IndexOf(searchText2);
-                        string firstBit = aLine.Substring(0, (locationStart + searchText2.Length));
-                        string remaining = aLine.Substring((locationStart + searchText2.Length));
+                        var searchLength = searchText2.Length;
+
+                        string initail = aLine.Substring((locationStart + searchText2.Length));
+                        var openerlocationStart = initail.IndexOf(searchVstart);
+
+                        searchLength += (openerlocationStart + searchVstart.Length);
+
+                        string firstBit = aLine.Substring(0, (locationStart + searchLength));
+                        string remaining = aLine.Substring((locationStart + searchLength));
                         int locationEnd = remaining.IndexOf("\"");
                         string end = remaining.Substring(locationEnd);
 
@@ -236,7 +252,7 @@ namespace DSoft.VersionChanger.Data
                         var newLine = String.Format("{0}{1}{2}", firstBit, newFileVersionValue.ToString(), end);
 
 
-                        objEditPt.ReplaceText(objEditPt.LineLength, newLine, (int)vsEPReplaceTextOptions.vsEPReplaceTextAutoformat);
+                        objEditPt.ReplaceText(objEditPt.LineLength, newLine, (int)vsEPReplaceTextOptions.vsEPReplaceTextKeepMarkers);
 
                         var aLine2 = objEditPt.GetText(objEditPt.LineLength);
 
@@ -509,8 +525,10 @@ namespace DSoft.VersionChanger.Data
             var endPpint = editDoc.EndPoint.CreateEditPoint();
             endPpint.EndOfDocument();
 
-            string searchText = "AssemblyVersion(\"";
-            string searchText2 = "AssemblyFileVersion(\"";
+            string searchText = "AssemblyVersion";
+            string searchText2 = "AssemblyFileVersion";
+            string searchVstart = "(\"";
+            
 
             var ednLine = endPpint.Line;
 
@@ -525,9 +543,14 @@ namespace DSoft.VersionChanger.Data
 
                     if (aLine.Contains(searchText))
                     {
-                        //now get the version number
+                        //find the AssemblyVersion 
                         int locationStart = aLine.IndexOf(searchText);
                         string remaining = aLine.Substring((locationStart + searchText.Length));
+
+                        //find the start of the version definition
+                        locationStart = remaining.IndexOf(searchVstart);
+                        remaining = remaining.Substring((locationStart + searchVstart.Length));
+
                         int locationEnd = remaining.IndexOf("\"");
                         version = remaining.Substring(0, locationEnd);
 
@@ -538,6 +561,11 @@ namespace DSoft.VersionChanger.Data
                     {
                         int locationStart = aLine.IndexOf(searchText2);
                         string remaining = aLine.Substring((locationStart + searchText2.Length));
+
+                        //find the start of the version definition
+                        locationStart = remaining.IndexOf(searchVstart);
+                        remaining = remaining.Substring((locationStart + searchVstart.Length));
+
                         int locationEnd = remaining.IndexOf("\"");
                         fileVersion = remaining.Substring(0, locationEnd);
 

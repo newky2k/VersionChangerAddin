@@ -103,9 +103,11 @@ namespace DSoft.VersionChanger.Data
                                 };
 
                                 FailedProjects.Add(newFailedProject);
+
+                                continue;
                             }
 
-                            continue;
+                           
                         }
                         else
                         {

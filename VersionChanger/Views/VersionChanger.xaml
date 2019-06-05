@@ -84,7 +84,7 @@
                     </StackPanel>
                     <StackPanel Grid.Row="1" VerticalAlignment="Bottom">
                         <CheckBox Margin="5,0,0,5" IsChecked="{Binding UpdateClickOnce}" Content="Update ClickOnce"/>
-                        <CheckBox Margin="5,0,0,5" IsChecked="{Binding SeperateVersions}" Content="Use seperate versions"/>
+                        <CheckBox Margin="5,0,0,5" IsChecked="{Binding SeparateVersions}" Content="Use seperate versions"/>
                         <CheckBox Margin="5,0,0,5" IsChecked="{Binding ForceSemVer}" Content="Use SemVer 2.0" ToolTip="Will use Major, Minor, Build versions only for Assembly and File version. Will update nuget version for new style csproj files"/>
                     </StackPanel>
                 </Grid>
@@ -135,35 +135,35 @@
                                  Width="125" 
                                  Margin="0,5,0,0" 
                                  TextAlignment="Right" 
-                                 IsEnabled="{Binding SeperateVersions}"
+                                 IsEnabled="{Binding SeparateVersions}"
                                  data:Masking.Mask="^[0-9][\.\d]*(,\d+)?$" />-->
                             <TextBox 
                                  Text="{Binding AssemblyFileMajor}" 
                                  Width="50" 
                                  Margin="0,5,5,0" 
                                  TextAlignment="Right" 
-                                 IsEnabled="{Binding SeperateVersions}"
+                                 IsEnabled="{Binding SeparateVersions}"
                                  data:Masking.Mask="^[0-9][\d]*(,\d+)?$" />
                             <TextBox  
                                  Text="{Binding AssemblyFileMinor}" 
                                  Width="50" 
                                  Margin="0,5,5,0" 
                                  TextAlignment="Right" 
-                                 IsEnabled="{Binding SeperateVersions}"
+                                 IsEnabled="{Binding SeparateVersions}"
                                  data:Masking.Mask="^[0-9][\d]*(,\d+)?$"  />
                             <TextBox  
                                  Text="{Binding AssemblyFileBuild}" 
                                  Width="50" 
                                  Margin="0,5,5,0" 
                                  TextAlignment="Right" 
-                                 IsEnabled="{Binding SeperateVersions}"
+                                 IsEnabled="{Binding SeparateVersions}"
                                  data:Masking.Mask="^[0-9][\d]*(,\d+)?$"  />
                             <TextBox  
                                  Text="{Binding AssesmblyFileRevision}" 
                                  Width="50" 
                                  Margin="0,5,5,0" 
                                  TextAlignment="Right" 
-                                 IsEnabled="{Binding SeperateVersions}"
+                                 IsEnabled="{Binding SeparateVersions}"
                                 Visibility="{Binding ShowRevision, Converter={StaticResource booleanToVisibilityConverter}}"
                                  data:Masking.Mask="^[0-9][\d]*(,\d+)?$"  />
                         </StackPanel>

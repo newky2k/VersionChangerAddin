@@ -1,4 +1,8 @@
-﻿Changes in 2.2.0
+﻿Changes in 2.3.0
+ - Fixed issues with the loading of the projects
+ - Fixed binding on the SeperateVersions checkbox
+
+Changes in 2.2.0
  - Fixed issues with processing AssemblyInfo.cs where there were gaps
  - Fixed issue with processing Android projects without manifest.xml files
 

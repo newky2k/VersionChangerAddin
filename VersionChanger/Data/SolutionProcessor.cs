@@ -71,10 +71,17 @@ namespace DSoft.VersionChanger.Data
 
                         if (projectTypeGuids != null)
                         {
-                            var ignorableTypes = new List<string>() { "{54435603-DBB4-11D2-8724-00A0C9A8B90C}", "{930C7802-8A8C-48F9-8165-68863BCCD9DD}"};
+                            var ignorableTypes = new List<string>()
+                            {
+                                "{54435603-DBB4-11D2-8724-00A0C9A8B90C}"
+                                , "{930C7802-8A8C-48F9-8165-68863BCCD9DD}"
+                                , "{7CF6DF6D-3B04-46F8-A40B-537D21BCA0B4}" // Sandcast Help File Builder project 
+                            };
+
+                            var firstTypeId = projectTypeGuids.First().ToUpper();
 
                             //if the type of the project is on the ignore list then skip
-                            if (ignorableTypes.Contains(projectTypeGuids.First().ToUpper()))
+                            if (ignorableTypes.Contains(firstTypeId))
                             {
                                 continue;
                             }
@@ -388,7 +395,7 @@ namespace DSoft.VersionChanger.Data
             {
                 
 
-                if (aItem.ProjectItems.Count > 0)
+                if (aItem.ProjectItems?.Count > 0)
                 {
                     var aResult = FindProjectItem(aItem.ProjectItems, fileName);
 

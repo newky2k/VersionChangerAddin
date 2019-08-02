@@ -65,7 +65,12 @@ namespace DSoft.VersionChanger.Views
 
         private void OnLoaded(object sender, RoutedEventArgs e)
         {
-           
+           if (mViewModel.Items.Count == 0 && mViewModel.Errors.Count == 0)
+            {
+                MessageBox.Show("There were no compatible projects found in the solution");
+
+                this.DialogResult = true;
+            }
         }
 
         private void FilterClick(object sender, RoutedEventArgs e)

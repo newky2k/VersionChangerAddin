@@ -35,6 +35,8 @@ namespace DSoft.VersionChanger.Views
             mViewModel = new ProjectViewModel(applicationObject);
 
             this.DataContext = mViewModel;
+
+            CheckBox_Checked(this, null);
         }
 
         private void OnBeginClicked(object sender, RoutedEventArgs e)
@@ -76,6 +78,11 @@ namespace DSoft.VersionChanger.Views
         private void FilterClick(object sender, RoutedEventArgs e)
         {
             mViewModel.FilterProjects();
+        }
+
+        private void CheckBox_Checked(object sender, RoutedEventArgs e)
+        {
+            hdrVersionSuffix.Visibility = mViewModel.ShowSemVer ? Visibility.Visible : Visibility.Hidden;
         }
     }
 }

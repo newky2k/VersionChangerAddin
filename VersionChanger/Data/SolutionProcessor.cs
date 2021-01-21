@@ -10,6 +10,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace DSoft.VersionChanger.Data
 {
@@ -146,7 +147,7 @@ namespace DSoft.VersionChanger.Data
             return versions;
         }
 
-        internal void UpdateProject(Project realProject, Version newVersion, Version fileVersion = null)
+        internal void UpdateProject(Project realProject, Version newVersion, Version fileVersion = null, string versionSuffix = null)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
@@ -165,7 +166,13 @@ namespace DSoft.VersionChanger.Data
                 }
                 else if (aProp.Name.ToLower().Equals("version"))
                 {
-                    aProp.Value = (newVersion.Revision == -1) ? newVersion.ToString(3) : newVersion.ToString();
+                    var str = (newVersion.Revision == -1) ? newVersion.ToString(3) : newVersion.ToString();
+                    if (string.IsNullOrEmpty(versionSuffix) == false) str += $"-{versionSuffix}";
+                    aProp.Value = str;
+                }
+                else if (aProp.Name.ToLower().Equals("versionsuffix"))
+                {
+                    aProp.Value = versionSuffix;
                 }
                 else if (aProp.Name.Equals("packageversion", StringComparison.OrdinalIgnoreCase))
                 {
@@ -183,7 +190,7 @@ namespace DSoft.VersionChanger.Data
         /// <param name="item">The item.</param>
         /// <param name="newAssemblyVersion">The new assembly version.</param>
         /// <param name="newFileVersion">The new file version.</param>
-        public void UpdateFile(ProjectItem item, Version newAssemblyVersion, Version newFileVersion = null)
+        public void UpdateFile(ProjectItem item, Version newAssemblyVersion, Version newFileVersion = null, string versionSuffix = null)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
@@ -201,6 +208,7 @@ namespace DSoft.VersionChanger.Data
 
             string searchText = "AssemblyVersion";
             string searchText2 = "AssemblyFileVersion";
+            string searchText3 = "AssemblyInformationalVersion";
             string searchVstart = "(\"";
 
             //if the file version is null, as seperate version have not been set
@@ -211,7 +219,7 @@ namespace DSoft.VersionChanger.Data
 
             var updatedVersion = false;
             var updatedFileVersion = false;
-
+            var updatedVersionSuffix = false;
             var endLine = endPpint.Line;
 
 
@@ -283,15 +291,60 @@ namespace DSoft.VersionChanger.Data
                         updatedFileVersion = true;
 
                     }
+
+                    if (aLine.Contains(searchText3) && string.IsNullOrEmpty(versionSuffix) == false)
+                    {
+                        int locationStart = aLine.IndexOf(searchText3);
+                        var searchLength = searchText3.Length;
+
+                        string initail = aLine.Substring((locationStart + searchText3.Length));
+                        var openerlocationStart = initail.IndexOf(searchVstart);
+
+                        searchLength += (openerlocationStart + searchVstart.Length);
+
+                        string firstBit = aLine.Substring(0, (locationStart + searchLength));
+                        string remaining = aLine.Substring((locationStart + searchLength));
+                        int locationEnd = remaining.IndexOf("\"");
+                        string end = remaining.Substring(locationEnd);
+
+                        var newFileVersionValue = (newFileVersion.Revision == -1) ? $"{newFileVersion.Major}.{newFileVersion.Minor}.{newFileVersion.Build}.0" : newFileVersion.ToString();
+
+                        if (string.IsNullOrEmpty(versionSuffix) == false)
+                        {
+                            // overriding for semver
+                            newFileVersionValue += $"-{versionSuffix}";
+                        }
+
+                        var newLine = String.Format("{0}{1}{2}", firstBit, newFileVersionValue.ToString(), end);
+
+
+                        objEditPt.ReplaceText(objEditPt.LineLength, newLine, (int)vsEPReplaceTextOptions.vsEPReplaceTextKeepMarkers);
+
+                        var aLine2 = objEditPt.GetText(objEditPt.LineLength);
+
+                        //Console.WriteLine(aLine2);
+
+                        updatedVersionSuffix = true;
+
+                    }
                 }
 
                 if (updatedVersion
-                    && updatedFileVersion)
+                    && updatedFileVersion
+                    && (objEditPt.AtEndOfDocument || string.IsNullOrEmpty(versionSuffix) || updatedVersionSuffix))
                     break;
 
                 objEditPt.LineDown();
                 objEditPt.StartOfLine();
 
+            }
+
+            if (updatedVersionSuffix == false && string.IsNullOrEmpty(versionSuffix) == false)
+            {
+                var newFileVersionValue = (newFileVersion.Revision == -1) ? $"{newFileVersion.Major}.{newFileVersion.Minor}.{newFileVersion.Build}.0" : newFileVersion.ToString();
+                newFileVersionValue += $"-{versionSuffix}";
+                var newLine = String.Format("[assembly: AssemblyInformationalVersion(\"{0}\")]\r\n", newFileVersionValue);
+                objEditPt.Insert(newLine);
             }
 
             item.Save();
@@ -533,6 +586,7 @@ namespace DSoft.VersionChanger.Data
 
             string version = String.Empty;
             string fileVersion = String.Empty;
+            string versionSuffix = String.Empty;
 
             if (!projectItem.IsOpen)
                 projectItem.Open();
@@ -549,6 +603,7 @@ namespace DSoft.VersionChanger.Data
 
             string searchText = "AssemblyVersion";
             string searchText2 = "AssemblyFileVersion";
+            string searchText3 = "AssemblyInformationalVersion";
             string searchVstart = "(\"";
             
 
@@ -592,10 +647,24 @@ namespace DSoft.VersionChanger.Data
                         fileVersion = remaining.Substring(0, locationEnd);
 
                     }
+
+                    if (aLine.Contains(searchText3))
+                    {
+                        int locationStart = aLine.IndexOf(searchText3);
+                        string remaining = aLine.Substring((locationStart + searchText3.Length));
+
+                        locationStart = remaining.IndexOf(searchVstart);
+                        remaining = remaining.Substring((locationStart + searchVstart.Length));
+
+                        int locationEnd = remaining.IndexOf("\"");
+                        versionSuffix = remaining.Substring(0, locationEnd);
+
+                    }
                 }
 
                 if (!String.IsNullOrWhiteSpace(version)
-                    && !String.IsNullOrWhiteSpace(fileVersion))
+                    && !String.IsNullOrWhiteSpace(fileVersion)
+                     && !string.IsNullOrEmpty(versionSuffix))
                     break;
 
                 if (objEditPt.Line == ednLine)
@@ -645,6 +714,22 @@ namespace DSoft.VersionChanger.Data
                     }
                 }
 
+                if (string.IsNullOrEmpty(versionSuffix) == false)
+                {
+                    if (versionSuffix.Contains("-"))
+                    {
+                        var start = versionSuffix.IndexOf("-");
+                        if (start < versionSuffix.Length)
+                        {
+                            versionSuffix = versionSuffix.Substring(start + 1);
+                            if (Regex.IsMatch(versionSuffix, @"^[0-9a-zA-Z\-]+$"))
+                            {
+                                newVersion.VersionSuffix = versionSuffix;
+                            }
+                        }
+                    }
+                }
+
                 return newVersion;
             }
             else
@@ -672,6 +757,7 @@ namespace DSoft.VersionChanger.Data
             var version = string.Empty;
             var fileVersion = string.Empty;
             var packageVersion = string.Empty;
+            var versionSuffix = string.Empty;
 
             ThreadHelper.ThrowIfNotOnUIThread();
 
@@ -688,6 +774,16 @@ namespace DSoft.VersionChanger.Data
                 else if (aProp.Name.ToLower().Equals("version"))
                 {
                     packageVersion = aProp.Value as String;
+                    if (packageVersion.Contains("-") && string.IsNullOrEmpty(versionSuffix))
+                    {
+                        var start = packageVersion.IndexOf("-");
+                        if (start < packageVersion.Length) start += 1;
+                        versionSuffix = packageVersion.Substring(start);
+                    }
+                }
+                else if (aProp.Name.ToLower().Equals("versionsuffix"))
+                {
+                    versionSuffix = aProp.Value as String;
                 }
             }
 
@@ -702,7 +798,7 @@ namespace DSoft.VersionChanger.Data
                 newVersion.RealProject = project;
                 newVersion.IsNewStyleProject = true;
                 newVersion.ProjectType = "SDK";
-
+                newVersion.VersionSuffix = versionSuffix;
                 try
                 {
                     newVersion.AssemblyVersion = new Version(version);

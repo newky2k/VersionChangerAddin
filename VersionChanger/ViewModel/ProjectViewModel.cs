@@ -27,9 +27,10 @@ namespace DSoft.VersionChanger.ViewModel
         private string cocoaShortVersion;
         private DTE mApplication;
         private string androidBuild;
-        private bool selectAll = false;
+        private bool selectAll = true;
         private bool mUpdateClickOnce;
         private bool forceSemVer;
+        private string preRelease;
         private bool _updateNuget;
         private bool _showUnloadedWarning;
         private List<FailedProject> _failedProjects;
@@ -275,7 +276,13 @@ namespace DSoft.VersionChanger.ViewModel
                 SettingsControl.SetBooleanValue(value, "ForceSemVer");
                 PropertyDidChange("ForceSemVer");
                 PropertyDidChange("ShowRevision");
+                PropertyDidChange("ShowSemVer");
             }
+        }
+
+        public bool ShowSemVer
+        {
+            get { return forceSemVer; }
         }
 
         public bool ShowIos
@@ -364,6 +371,12 @@ namespace DSoft.VersionChanger.ViewModel
         {
             get { return androidBuild; }
             set { androidBuild = value; PropertyDidChange("AndroidBuild"); }
+        }
+
+        public string PreRelase
+        {
+            get { return preRelease; }
+            set { preRelease = value; PropertyDidChange("PreRelase"); }
         }
 
         public bool UpdateNuget
@@ -495,12 +508,12 @@ namespace DSoft.VersionChanger.ViewModel
                         {
                             if (ver.IsNewStyleProject == true)
                             {
-                                solutionProcessor.UpdateProject(ver.RealProject, newVersion, fileVersion);
+                                solutionProcessor.UpdateProject(ver.RealProject, newVersion, fileVersion, forceSemVer ? preRelease : null);
 
                             }
                             else
                             {
-                                solutionProcessor.UpdateFile(ver.ProjectItem, newVersion, fileVersion);
+                                solutionProcessor.UpdateFile(ver.ProjectItem, newVersion, fileVersion, forceSemVer ? preRelease : null);
                             }
 
 

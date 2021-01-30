@@ -17,6 +17,7 @@ namespace DSoft.VersionChanger.Data
         private Version m_AssemblyVersion;
         private Version mFileVersion;
         private string _version;
+        private string _versionSuffix;
 
         private bool isNewStyleProject;
 
@@ -133,6 +134,20 @@ namespace DSoft.VersionChanger.Data
                 _version = value;
 
                 PropertyDidChange(nameof(PackageVersion));
+            }
+        }
+
+        public string VersionSuffix
+        {
+            get
+            {
+                return _versionSuffix;
+            }
+            set
+            {
+                _versionSuffix = value;
+
+                PropertyDidChange(nameof(VersionSuffix));
             }
         }
 

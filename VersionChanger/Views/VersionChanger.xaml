@@ -62,6 +62,13 @@
                             </Style>
                         </DataGridTextColumn.ElementStyle>
                     </DataGridTextColumn>
+                    <DataGridTextColumn x:Name="hdrVersionSuffix" Header="VersionSuffix" Width="120" Binding="{Binding VersionSuffix}" IsReadOnly="True">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="{x:Type TextBlock}">
+                                <Setter Property="HorizontalAlignment" Value="Center" />
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
 
                 </DataGrid.Columns>
             </DataGrid>
@@ -85,7 +92,7 @@
                     <StackPanel Grid.Row="1" VerticalAlignment="Bottom">
                         <CheckBox Margin="5,0,0,5" IsChecked="{Binding UpdateClickOnce}" Content="Update ClickOnce"/>
                         <CheckBox Margin="5,0,0,5" IsChecked="{Binding SeparateVersions}" Content="Use seperate versions"/>
-                        <CheckBox Margin="5,0,0,5" IsChecked="{Binding ForceSemVer}" Content="Use SemVer 2.0" ToolTip="Will use Major, Minor, Build versions only for Assembly and File version. Will update nuget version for new style csproj files"/>
+                        <CheckBox Margin="5,0,0,5" IsChecked="{Binding ForceSemVer}" Checked="CheckBox_Checked" Unchecked="CheckBox_Checked" Content="Use SemVer 2.0" ToolTip="Will use Major, Minor, Build versions only for Assembly and File version. Will update nuget version for new style csproj files"/>
                     </StackPanel>
                 </Grid>
                 <Grid Grid.Column="1" VerticalAlignment="Top" Margin="0,5,0,5">
@@ -167,6 +174,18 @@
                                 Visibility="{Binding ShowRevision, Converter={StaticResource booleanToVisibilityConverter}}"
                                  data:Masking.Mask="^[0-9][\d]*(,\d+)?$"  />
                         </StackPanel>
+                        <Grid VerticalAlignment="Center" x:Name="secPre" Visibility="{Binding ShowSemVer, Converter={StaticResource booleanToVisibilityConverter}}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" VerticalAlignment="Center" Margin="0,5,5,0" Width="125" ToolTip="Pre-release label, alphanumberic (+ hyphen) string i.e for beta1 you get 1.0.0-beta1" >VersionSuffix (optional)</TextBlock>
+                            <TextBox  Grid.Column="1"
+                                 Text="{Binding PreRelase}" 
+                                 Margin="0,5,0,0" 
+                                 TextAlignment="Right" 
+                                 data:Masking.Mask="^[0-9A-Za-z-]*$"  />
+                        </Grid>
                         <Grid VerticalAlignment="Center" x:Name="secIos" Visibility="{Binding ShowIos, Converter={StaticResource booleanToVisibilityConverter}}">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto"/>

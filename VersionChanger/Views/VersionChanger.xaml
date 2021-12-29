@@ -3,7 +3,7 @@
         xmlns:vsUI="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.15.0"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:data="clr-namespace:DSoft.VersionChanger.Data"
-        Title="Version Changer"  Height="600" Width="525" ResizeMode="NoResize" WindowStartupLocation="CenterOwner" ShowInTaskbar="False" Loaded="OnLoaded">
+        Title="Version Changer 2022"  Height="600" Width="600" ResizeMode="NoResize" WindowStartupLocation="CenterOwner" ShowInTaskbar="False" Loaded="OnLoaded">
     <vsUI:DialogWindow.Resources>
         <ResourceDictionary Source="/VersionChanger;component/Themes/generic.xaml" />
     </vsUI:DialogWindow.Resources>

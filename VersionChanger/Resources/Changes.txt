@@ -1,4 +1,6 @@
-﻿Changes in 2.3.0
+﻿Chnages in 3.0.0.0
+  - Updated to work with Visual Studio 2022+
+Changes in 2.3.0
  - Fixed issues with the loading of the projects
  - Fixed binding on the SeperateVersions checkbox
 

@@ -1,23 +1,29 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
     <Metadata>
-        <Identity Id="VersionChanger.315c8ff9-932e-4b23-b9d8-0fcd23bdb0be" Version="2.3.3" Language="en-US" Publisher="DSoft Developments" />
-        <DisplayName>Version Changer</DisplayName>
-        <Description xml:space="preserve">Visual Studio extension that allows you to change the version number of all projects in a solution in a easy to user interface.</Description>
+        <Identity Id="VersionChanger2022.315c8ff9-932e-4b23-b9d8-0fcd23bdb0be" Version="3.0.0" Language="en-US" Publisher="Newky2k" />
+        <DisplayName>Version Changer 2022</DisplayName>
+        <Description xml:space="preserve">Visual Studio 2022 extension that allows you to change the version number of all projects in a solution in a easy to user interface.</Description>
         <MoreInfo>https://visualstudiogallery.msdn.microsoft.com/554c35ef-fe76-4138-b60e-a44b72ade70e</MoreInfo>
         <ReleaseNotes>Changes.txt</ReleaseNotes>
         <Icon>Resources\Package.ico</Icon>
     </Metadata>
     <Installation>
-        <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[15.0, 17.0)" />
-        <InstallationTarget Version="[15.0,17.0)" Id="Microsoft.VisualStudio.Pro" />
-        <InstallationTarget Version="[15.0,17.0)" Id="Microsoft.VisualStudio.Enterprise" />
+        <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[17.0, 18.0)">
+            <ProductArchitecture>amd64</ProductArchitecture>
+        </InstallationTarget>
+        <InstallationTarget Id="Microsoft.VisualStudio.Pro" Version="[17.0, 18.0)">
+            <ProductArchitecture>amd64</ProductArchitecture>
+        </InstallationTarget>
+        <InstallationTarget Id="Microsoft.VisualStudio.Enterprise" Version="[17.0, 18.0)">
+            <ProductArchitecture>amd64</ProductArchitecture>
+        </InstallationTarget>
     </Installation>
     <Dependencies>
         <Dependency Id="Microsoft.Framework.NDP" DisplayName="Microsoft .NET Framework" d:Source="Manual" Version="[4.6,)" />
     </Dependencies>
     <Prerequisites>
-        <Prerequisite Id="Microsoft.VisualStudio.Component.CoreEditor" Version="[15.0,)" DisplayName="Visual Studio core editor" />
+        <Prerequisite Id="Microsoft.VisualStudio.Component.CoreEditor" Version="[17.0,)" DisplayName="Visual Studio core editor" />
     </Prerequisites>
     <Assets>
         <Asset Type="Microsoft.VisualStudio.VsPackage" d:Source="Project" d:ProjectName="%CurrentProject%" Path="|%CurrentProject%;PkgdefProjectOutputGroup|" />

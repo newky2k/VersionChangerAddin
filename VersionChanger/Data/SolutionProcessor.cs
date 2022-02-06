@@ -179,6 +179,10 @@ namespace DSoft.VersionChanger.Data
                     aProp.Value = (newVersion.Revision == -1) ? newVersion.ToString(3) : newVersion.ToString();
 
                 }
+                else if (aProp.Name.ToLower().Equals("assemblyinformationalversion") || aProp.Name.ToLower().Equals("informationalversion"))
+                {
+                    aProp.Value = (newVersion.Revision == -1) ? newVersion.ToString(3) : newVersion.ToString();
+                }
             }
 
             realProject.Save();
@@ -210,6 +214,7 @@ namespace DSoft.VersionChanger.Data
             string searchText2 = "AssemblyFileVersion";
             string searchText3 = "AssemblyInformationalVersion";
             string searchVstart = "(\"";
+            string assemblyText = "assembly:";
 
             //if the file version is null, as seperate version have not been set
             if (newFileVersion == null)
@@ -231,7 +236,7 @@ namespace DSoft.VersionChanger.Data
                         && !aLine.StartsWith("'"))
                 {
 
-                    if (aLine.Contains(searchText))
+                    if (aLine.Contains(searchText) && aLine.Contains(assemblyText))
                     {
                         //now get the version number
                         int locationStart = aLine.IndexOf(searchText);
@@ -261,8 +266,7 @@ namespace DSoft.VersionChanger.Data
                         updatedVersion = true;
                     }
 
-
-                    if (aLine.Contains(searchText2))
+                    if (aLine.Contains(searchText2) && aLine.Contains(assemblyText))
                     {
                         int locationStart = aLine.IndexOf(searchText2);
                         var searchLength = searchText2.Length;
@@ -292,7 +296,7 @@ namespace DSoft.VersionChanger.Data
 
                     }
 
-                    if (aLine.Contains(searchText3) && string.IsNullOrEmpty(versionSuffix) == false)
+                    if (aLine.Contains(searchText3) && aLine.Contains(assemblyText) && string.IsNullOrEmpty(versionSuffix) == false)
                     {
                         int locationStart = aLine.IndexOf(searchText3);
                         var searchLength = searchText3.Length;

@@ -79,6 +79,7 @@
     <Compile Include="Data\ProjectVersion.cs" />
     <Compile Include="Data\ProjectVersionCollection.cs" />
     <Compile Include="Data\SolutionProcessor.cs" />
+    <Compile Include="Data\UWPVersion.cs" />
     <Compile Include="Enums\AppType.cs" />
     <Compile Include="Enums\plistType.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />

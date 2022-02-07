@@ -68,6 +68,7 @@ namespace DSoft.VersionChanger.Data
                         bool hasCocoa = false;
                         bool hasAndroid = false;
                         bool isSdk = false;
+                        bool hasUwp = false;
 
                         var projectTypeGuids = GetProjectTypeGuids(proj);
                         ProjectItem projectItem = null;
@@ -92,6 +93,7 @@ namespace DSoft.VersionChanger.Data
                             var iOSTypes = new List<String> { "{FEACFBD2-3405-455C-9665-78FE426C6842}", "{EE2C853D-36AF-4FDB-B1AD-8E90477E2198}" };
                             var androidTypes = new List<String> { "{EFBA0AD7-5A72-4C68-AF49-83D382785DCF}", "{10368E6C-D01B-4462-8E8B-01FC667A7035}" };
                             var macTypes = new List<String> { "{A3F8F2AB-B479-4A4A-A458-A89E7DC349F1}", "{EE2C853D-36AF-4FDB-B1AD-8E90477E2198}" };
+                            var uwpTypes = new List<string> { "{A5A43C5B-DE2A-4C0C-9213-0A381AF9435A}" };
 
                             if (iOSTypes.Contains(projectTypeGuids.First()) || macTypes.Contains(projectTypeGuids.First()))
                             {
@@ -100,6 +102,10 @@ namespace DSoft.VersionChanger.Data
                             else if (androidTypes.Contains(projectTypeGuids.First()))
                             {
                                 hasAndroid = true;
+                            }
+                            else if (uwpTypes.Contains(projectTypeGuids.First()))
+                            {
+                                hasUwp = true;
                             }
 
                             projectItem = FindAssemblyInfoProjectItem(proj.ProjectItems);
@@ -117,7 +123,6 @@ namespace DSoft.VersionChanger.Data
                                 continue;
                             }
 
-                           
                         }
                         else
                         {
@@ -126,7 +131,7 @@ namespace DSoft.VersionChanger.Data
                             isSdk = true;
                         }
 
-                        var newVersion = LoadVersionNumber(proj, projectItem, hasCocoa, hasAndroid, isSdk);
+                        var newVersion = LoadVersionNumber(proj, projectItem, hasCocoa, hasAndroid, hasUwp, isSdk);
 
                         if (newVersion != null)
                         {
@@ -489,13 +494,6 @@ namespace DSoft.VersionChanger.Data
             return FindProjectItem(items, "assemblyinfo");
         }
 
-        private ProjectItem FindAppManifest(ProjectItems items)
-        {
-            ThreadHelper.ThrowIfNotOnUIThread();
-
-            return FindProjectItem(items, "package.appxmanifest");
-        }
-
         private ProjectItem FindProjectItem(ProjectItems items, string fileName)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
@@ -597,11 +595,11 @@ namespace DSoft.VersionChanger.Data
             return service;
         }
 
-        private ProjectVersion LoadVersionNumber(EnvDTE.Project project, ProjectItem projectItem, bool hasCocoa, bool hasAndroid, bool isSdk)
+        private ProjectVersion LoadVersionNumber(EnvDTE.Project project, ProjectItem projectItem, bool hasCocoa, bool hasAndroid, bool hasUWP, bool isSdk)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
-            ProjectVersion result = null;
+            ProjectVersion result;
 
 
             result = (isSdk) ? ProcessNewStyleProject(project) : ProcessOldStyleProject(project, projectItem);
@@ -616,6 +614,9 @@ namespace DSoft.VersionChanger.Data
 
                     var infoPlist = FindProjectItem(project.ProjectItems, "info.plist");
                     result.SecondaryProjectItem = infoPlist;
+
+                    if (infoPlist != null && infoPlist.Document != null)
+                        infoPlist.Document.Close();
                 }
                 else if (hasAndroid)
                 {
@@ -624,6 +625,21 @@ namespace DSoft.VersionChanger.Data
 
                     var aManifest = FindProjectItem(project.ProjectItems, "androidmanifest.xml");
                     result.SecondaryProjectItem = aManifest;
+
+                    if (aManifest != null && aManifest.Document != null)
+                        aManifest.Document.Close();
+                }
+                else if (hasUWP)
+                {
+                    result.IsUWP = true;
+                    result.ProjectType = "UWP";
+
+                    var packageManifest = FindProjectItem(project.ProjectItems, "package.appxmanifest");
+                    result.SecondaryProjectItem = packageManifest;
+
+                    if (packageManifest != null && packageManifest.Document != null)
+                        packageManifest.Document.Close();
+
 
                 }
 

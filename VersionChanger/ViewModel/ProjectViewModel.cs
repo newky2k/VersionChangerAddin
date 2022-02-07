@@ -627,6 +627,19 @@ namespace DSoft.VersionChanger.ViewModel
                                     aUpdater.VersionTwo = newVersionValue;
                                     aUpdater.Update();
                                 }
+                                else if (ver.IsUWP == true)
+                                {
+                                    var secFile = ver.SecondaryProjectItem.FileNames[0];
+
+                                    var uwpUpdater = new UWPVersion()
+                                    {
+                                        FilePath = secFile,
+                                    };
+
+                                    uwpUpdater.VersionOne = $"{Version.Parse(newVersionValue).ToString(3)}.0";
+                                    uwpUpdater.Update();
+
+                                }
                             }
 
                         }

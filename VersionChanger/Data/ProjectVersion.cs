@@ -200,6 +200,14 @@ namespace DSoft.VersionChanger.Data
         /// </summary>
         public bool IsAndroid { get; set; }
 
+		/// <summary>
+		/// Is UWP
+		/// </summary>
+		/// <value>
+		///   <c>true</c> if this instance is uwp; otherwise, <c>false</c>.
+		/// </value>
+		public bool IsUWP { get; set; }
+
         public ProjectItem SecondaryProjectItem { get; set; }
 
         private string _ProjectType;

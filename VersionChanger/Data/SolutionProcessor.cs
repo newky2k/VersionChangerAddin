@@ -264,11 +264,11 @@ namespace DSoft.VersionChanger.Data
                 newFileVersion = newAssemblyVersion;
             }
 
-            var updatedVersion = false;
-            var updatedFileVersion = false;
+
             var updatedVersionSuffix = false;
             var endLine = endPpint.Line;
 
+            var lastLine = false;
 
             while (true)
             {
@@ -307,7 +307,7 @@ namespace DSoft.VersionChanger.Data
                         var aLine2 = objEditPt.GetText(objEditPt.LineLength);
 
                         //Console.WriteLine(aLine2);
-                        updatedVersion = true;
+                        //updatedVersion = true;
                     }
 
                     if (aLine.Contains(searchText2) && aLine.Contains(assemblyText))
@@ -336,7 +336,7 @@ namespace DSoft.VersionChanger.Data
 
                         //Console.WriteLine(aLine2);
 
-                        updatedFileVersion = true;
+                        //updatedFileVersion = true;
 
                     }
 
@@ -371,19 +371,22 @@ namespace DSoft.VersionChanger.Data
                         var aLine2 = objEditPt.GetText(objEditPt.LineLength);
 
                         //Console.WriteLine(aLine2);
-
+                        //updatedInfoVersion = true;
                         updatedVersionSuffix = true;
 
                     }
                 }
 
-                if (updatedVersion
-                    && updatedFileVersion
-                    && (objEditPt.AtEndOfDocument || string.IsNullOrEmpty(versionSuffix) || updatedVersionSuffix))
-                    break;
+                //check to see if the last line has already been processed
+                if (objEditPt.Line.Equals(endLine) && lastLine == true)
+                    break;//break the loop
 
                 objEditPt.LineDown();
                 objEditPt.StartOfLine();
+
+                //if the we're on the last line, allow one further loop to process the line
+                if (objEditPt.Line.Equals(endLine))
+                    lastLine = true;
 
             }
 

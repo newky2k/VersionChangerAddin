@@ -67,6 +67,7 @@ namespace DSoft.VersionChanger.Data
                         
                         bool hasCocoa = false;
                         bool hasAndroid = false;
+                        bool isSdk = false;
 
                         var projectTypeGuids = GetProjectTypeGuids(proj);
                         ProjectItem projectItem = null;
@@ -121,9 +122,11 @@ namespace DSoft.VersionChanger.Data
                         else
                         {
                             projectItem = FindAssemblyInfoProjectItem(proj.ProjectItems);
+
+                            isSdk = true;
                         }
 
-                        var newVersion = LoadVersionNumber(proj, projectItem, hasCocoa, hasAndroid);
+                        var newVersion = LoadVersionNumber(proj, projectItem, hasCocoa, hasAndroid, isSdk);
 
                         if (newVersion != null)
                         {
@@ -238,8 +241,6 @@ namespace DSoft.VersionChanger.Data
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
-            string files = item.FileNames[0];
-
             if (!item.IsOpen)
                 item.Open();
 
@@ -274,7 +275,7 @@ namespace DSoft.VersionChanger.Data
             {
                 var aLine = objEditPt.GetText(objEditPt.LineLength);
 
-                Debug.WriteLine($"Line: {objEditPt.Line} - {aLine}");
+                //Debug.WriteLine($"Line: {objEditPt.Line} - {aLine}");
 
                 if (!aLine.StartsWith("//")
                         && !aLine.StartsWith("'"))
@@ -488,6 +489,13 @@ namespace DSoft.VersionChanger.Data
             return FindProjectItem(items, "assemblyinfo");
         }
 
+        private ProjectItem FindAppManifest(ProjectItems items)
+        {
+            ThreadHelper.ThrowIfNotOnUIThread();
+
+            return FindProjectItem(items, "package.appxmanifest");
+        }
+
         private ProjectItem FindProjectItem(ProjectItems items, string fileName)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
@@ -589,14 +597,14 @@ namespace DSoft.VersionChanger.Data
             return service;
         }
 
-        private ProjectVersion LoadVersionNumber(EnvDTE.Project project, ProjectItem projectItem, bool hasCocoa, bool hasAndroid)
+        private ProjectVersion LoadVersionNumber(EnvDTE.Project project, ProjectItem projectItem, bool hasCocoa, bool hasAndroid, bool isSdk)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
             ProjectVersion result = null;
 
 
-            result = (projectItem == null) ? ProcessNewStyleProject(project) : ProcessOldStyleProject(project, projectItem);
+            result = (isSdk) ? ProcessNewStyleProject(project) : ProcessOldStyleProject(project, projectItem);
 
             if (result != null)
             {

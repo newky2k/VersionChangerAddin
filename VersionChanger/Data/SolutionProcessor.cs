@@ -11,6 +11,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Xml;
 
 namespace DSoft.VersionChanger.Data
 {
@@ -169,6 +170,7 @@ namespace DSoft.VersionChanger.Data
                     var str = (newVersion.Revision == -1) ? newVersion.ToString(3) : newVersion.ToString();
                     if (string.IsNullOrEmpty(versionSuffix) == false) str += $"-{versionSuffix}";
                     aProp.Value = str;
+
                 }
                 else if (aProp.Name.ToLower().Equals("versionsuffix"))
                 {
@@ -186,6 +188,44 @@ namespace DSoft.VersionChanger.Data
             }
 
             realProject.Save();
+
+            var txt = File.ReadAllLines(realProject.FileName);
+            var searchableText = string.Join("", txt);
+
+            var seachText = "InformationalVersion";
+
+            var outPutLines = new List<string>();
+
+            if (searchableText.Contains("InformationalVersion"))
+            {
+                foreach (var aLine in txt)
+                {
+                    if (aLine.Contains($"<{seachText}>"))
+                    {
+                        var newLine = aLine;
+
+                        var pos = newLine.IndexOf($"<{seachText}>");
+                        var closer = newLine.IndexOf($"</{seachText}>");
+
+                        if (pos != -1 && closer != -1)
+                        {
+                            newLine = newLine.Substring(0, pos + (seachText.Length + 2));
+
+                            newLine += (newVersion.Revision == -1) ? newVersion.ToString(3) : newVersion.ToString();
+
+                            newLine += $"</{seachText}>";
+
+                            outPutLines.Add(newLine);
+                        }
+                    }
+                    else
+                    {
+                        outPutLines.Add(aLine);
+                    }
+                }
+
+                File.WriteAllLines(realProject.FileName, outPutLines);
+            }
         }
 
         /// <summary>
@@ -197,6 +237,8 @@ namespace DSoft.VersionChanger.Data
         public void UpdateFile(ProjectItem item, Version newAssemblyVersion, Version newFileVersion = null, string versionSuffix = null)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
+
+            string files = item.FileNames[0];
 
             if (!item.IsOpen)
                 item.Open();
@@ -228,9 +270,11 @@ namespace DSoft.VersionChanger.Data
             var endLine = endPpint.Line;
 
 
-            while (objEditPt.Line <= endPpint.Line)
+            while (true)
             {
                 var aLine = objEditPt.GetText(objEditPt.LineLength);
+
+                Debug.WriteLine($"Line: {objEditPt.Line} - {aLine}");
 
                 if (!aLine.StartsWith("//")
                         && !aLine.StartsWith("'"))
@@ -296,7 +340,7 @@ namespace DSoft.VersionChanger.Data
 
                     }
 
-                    if (aLine.Contains(searchText3) && aLine.Contains(assemblyText) && string.IsNullOrEmpty(versionSuffix) == false)
+                    if (aLine.Contains(searchText3) && aLine.Contains(assemblyText))
                     {
                         int locationStart = aLine.IndexOf(searchText3);
                         var searchLength = searchText3.Length;

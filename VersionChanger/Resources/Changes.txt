@@ -1,4 +1,10 @@
-﻿Chnages in 3.0.0.0
+﻿Changes in 3.1.0.0
+  - Added support for UWP package.appxmanifest files
+  - Improved support for Xamarin.Forms shared projects
+  - Added support for InformationalVersion in SDK style projects
+  - Fixed issues with AssemblyInformationalVersion in .NET Framework projects
+  - Minor UI changes
+Changes in 3.0.0.0
   - Updated to work with Visual Studio 2022+
 Changes in 2.3.0
  - Fixed issues with the loading of the projects

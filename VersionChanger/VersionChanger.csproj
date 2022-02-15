@@ -25,7 +25,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>DSoft.VersionChanger</RootNamespace>
     <AssemblyName>VersionChanger</AssemblyName>
-    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <GeneratePkgDefFile>true</GeneratePkgDefFile>
     <IncludeAssemblyInVSIXContainer>true</IncludeAssemblyInVSIXContainer>
     <IncludeDebugSymbolsInVSIXContainer>true</IncludeDebugSymbolsInVSIXContainer>
@@ -79,6 +79,7 @@
     <Compile Include="Data\ProjectVersion.cs" />
     <Compile Include="Data\ProjectVersionCollection.cs" />
     <Compile Include="Data\SolutionProcessor.cs" />
+    <Compile Include="Data\UWPVersion.cs" />
     <Compile Include="Enums\AppType.cs" />
     <Compile Include="Enums\plistType.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
@@ -122,14 +123,8 @@
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="Microsoft.VisualStudio.CommandBars, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-      <EmbedInteropTypes>False</EmbedInteropTypes>
-    </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
-    <Reference Include="stdole, Version=7.0.3300.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-      <EmbedInteropTypes>False</EmbedInteropTypes>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -151,30 +146,11 @@
     <PackageReference Include="MahApps.Metro">
       <Version>1.6.5</Version>
     </PackageReference>
-    <PackageReference Include="Microsoft.VisualStudio.Imaging.Interop.14.0.DesignTime">
-      <Version>17.0.31902.203</Version>
-    </PackageReference>
-    <PackageReference Include="Microsoft.VisualStudio.OLE.Interop">
-      <Version>17.0.31902.203</Version>
-    </PackageReference>
-    <PackageReference Include="Microsoft.VisualStudio.SDK.Analyzers">
-      <Version>16.10.10</Version>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="Microsoft.VisualStudio.SDK.EmbedInteropTypes">
-      <Version>15.0.36</Version>
-    </PackageReference>
-    <PackageReference Include="Microsoft.VisualStudio.Shell.15.0">
-      <Version>17.0.31902.203</Version>
-    </PackageReference>
-    <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers">
-      <Version>17.0.64</Version>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      <PrivateAssets>all</PrivateAssets>
+    <PackageReference Include="Microsoft.VisualStudio.SDK">
+      <Version>17.0.32112.339</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.VSSDK.BuildTools">
-      <Version>17.0.5232</Version>
+      <Version>17.0.5234</Version>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>

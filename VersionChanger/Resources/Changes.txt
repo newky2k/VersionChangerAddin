@@ -4,20 +4,7 @@
   - Added support for InformationalVersion in SDK style projects
   - Fixed issues with AssemblyInformationalVersion in .NET Framework projects
   - Minor UI changes
+
 Changes in 3.0.0.0
   - Updated to work with Visual Studio 2022+
-Changes in 2.3.0
- - Fixed issues with the loading of the projects
- - Fixed binding on the SeperateVersions checkbox
-
-Changes in 2.2.0
- - Fixed issues with processing AssemblyInfo.cs where there were gaps
- - Fixed issue with processing Android projects without manifest.xml files
-
-Changes in 2.0.2
-
-- Improved detection of unloaded projects, to reduce false positives
-- Fixed hanging issue when nodes are missing from the AssemblyInfo.cs file within a project
-- Added warning Notice when projects can be loaded
-  - You can also see the projects and errors
-- Improved look and feel of the notifcation banner
+  - Included support for SemVer version suffix

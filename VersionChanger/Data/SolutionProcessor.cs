@@ -11,6 +11,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Xml;
 
 namespace DSoft.VersionChanger.Data
 {
@@ -66,6 +67,8 @@ namespace DSoft.VersionChanger.Data
                         
                         bool hasCocoa = false;
                         bool hasAndroid = false;
+                        bool isSdk = false;
+                        bool hasUwp = false;
 
                         var projectTypeGuids = GetProjectTypeGuids(proj);
                         ProjectItem projectItem = null;
@@ -90,6 +93,7 @@ namespace DSoft.VersionChanger.Data
                             var iOSTypes = new List<String> { "{FEACFBD2-3405-455C-9665-78FE426C6842}", "{EE2C853D-36AF-4FDB-B1AD-8E90477E2198}" };
                             var androidTypes = new List<String> { "{EFBA0AD7-5A72-4C68-AF49-83D382785DCF}", "{10368E6C-D01B-4462-8E8B-01FC667A7035}" };
                             var macTypes = new List<String> { "{A3F8F2AB-B479-4A4A-A458-A89E7DC349F1}", "{EE2C853D-36AF-4FDB-B1AD-8E90477E2198}" };
+                            var uwpTypes = new List<string> { "{A5A43C5B-DE2A-4C0C-9213-0A381AF9435A}" };
 
                             if (iOSTypes.Contains(projectTypeGuids.First()) || macTypes.Contains(projectTypeGuids.First()))
                             {
@@ -98,6 +102,10 @@ namespace DSoft.VersionChanger.Data
                             else if (androidTypes.Contains(projectTypeGuids.First()))
                             {
                                 hasAndroid = true;
+                            }
+                            else if (uwpTypes.Contains(projectTypeGuids.First()))
+                            {
+                                hasUwp = true;
                             }
 
                             projectItem = FindAssemblyInfoProjectItem(proj.ProjectItems);
@@ -115,14 +123,15 @@ namespace DSoft.VersionChanger.Data
                                 continue;
                             }
 
-                           
                         }
                         else
                         {
                             projectItem = FindAssemblyInfoProjectItem(proj.ProjectItems);
+
+                            isSdk = true;
                         }
 
-                        var newVersion = LoadVersionNumber(proj, projectItem, hasCocoa, hasAndroid);
+                        var newVersion = LoadVersionNumber(proj, projectItem, hasCocoa, hasAndroid, hasUwp, isSdk);
 
                         if (newVersion != null)
                         {
@@ -169,6 +178,7 @@ namespace DSoft.VersionChanger.Data
                     var str = (newVersion.Revision == -1) ? newVersion.ToString(3) : newVersion.ToString();
                     if (string.IsNullOrEmpty(versionSuffix) == false) str += $"-{versionSuffix}";
                     aProp.Value = str;
+
                 }
                 else if (aProp.Name.ToLower().Equals("versionsuffix"))
                 {
@@ -179,9 +189,51 @@ namespace DSoft.VersionChanger.Data
                     aProp.Value = (newVersion.Revision == -1) ? newVersion.ToString(3) : newVersion.ToString();
 
                 }
+                else if (aProp.Name.ToLower().Equals("assemblyinformationalversion") || aProp.Name.ToLower().Equals("informationalversion"))
+                {
+                    aProp.Value = (newVersion.Revision == -1) ? newVersion.ToString(3) : newVersion.ToString();
+                }
             }
 
             realProject.Save();
+
+            var txt = File.ReadAllLines(realProject.FileName);
+            var searchableText = string.Join("", txt);
+
+            var seachText = "InformationalVersion";
+
+            var outPutLines = new List<string>();
+
+            if (searchableText.Contains("InformationalVersion"))
+            {
+                foreach (var aLine in txt)
+                {
+                    if (aLine.Contains($"<{seachText}>"))
+                    {
+                        var newLine = aLine;
+
+                        var pos = newLine.IndexOf($"<{seachText}>");
+                        var closer = newLine.IndexOf($"</{seachText}>");
+
+                        if (pos != -1 && closer != -1)
+                        {
+                            newLine = newLine.Substring(0, pos + (seachText.Length + 2));
+
+                            newLine += (newVersion.Revision == -1) ? newVersion.ToString(3) : newVersion.ToString();
+
+                            newLine += $"</{seachText}>";
+
+                            outPutLines.Add(newLine);
+                        }
+                    }
+                    else
+                    {
+                        outPutLines.Add(aLine);
+                    }
+                }
+
+                File.WriteAllLines(realProject.FileName, outPutLines);
+            }
         }
 
         /// <summary>
@@ -210,6 +262,7 @@ namespace DSoft.VersionChanger.Data
             string searchText2 = "AssemblyFileVersion";
             string searchText3 = "AssemblyInformationalVersion";
             string searchVstart = "(\"";
+            string assemblyText = "assembly:";
 
             //if the file version is null, as seperate version have not been set
             if (newFileVersion == null)
@@ -217,21 +270,23 @@ namespace DSoft.VersionChanger.Data
                 newFileVersion = newAssemblyVersion;
             }
 
-            var updatedVersion = false;
-            var updatedFileVersion = false;
+
             var updatedVersionSuffix = false;
             var endLine = endPpint.Line;
 
+            var lastLine = false;
 
-            while (objEditPt.Line <= endPpint.Line)
+            while (true)
             {
                 var aLine = objEditPt.GetText(objEditPt.LineLength);
+
+                //Debug.WriteLine($"Line: {objEditPt.Line} - {aLine}");
 
                 if (!aLine.StartsWith("//")
                         && !aLine.StartsWith("'"))
                 {
 
-                    if (aLine.Contains(searchText))
+                    if (aLine.Contains(searchText) && aLine.Contains(assemblyText))
                     {
                         //now get the version number
                         int locationStart = aLine.IndexOf(searchText);
@@ -258,11 +313,10 @@ namespace DSoft.VersionChanger.Data
                         var aLine2 = objEditPt.GetText(objEditPt.LineLength);
 
                         //Console.WriteLine(aLine2);
-                        updatedVersion = true;
+                        //updatedVersion = true;
                     }
 
-
-                    if (aLine.Contains(searchText2))
+                    if (aLine.Contains(searchText2) && aLine.Contains(assemblyText))
                     {
                         int locationStart = aLine.IndexOf(searchText2);
                         var searchLength = searchText2.Length;
@@ -288,11 +342,11 @@ namespace DSoft.VersionChanger.Data
 
                         //Console.WriteLine(aLine2);
 
-                        updatedFileVersion = true;
+                        //updatedFileVersion = true;
 
                     }
 
-                    if (aLine.Contains(searchText3) && string.IsNullOrEmpty(versionSuffix) == false)
+                    if (aLine.Contains(searchText3) && aLine.Contains(assemblyText))
                     {
                         int locationStart = aLine.IndexOf(searchText3);
                         var searchLength = searchText3.Length;
@@ -323,19 +377,22 @@ namespace DSoft.VersionChanger.Data
                         var aLine2 = objEditPt.GetText(objEditPt.LineLength);
 
                         //Console.WriteLine(aLine2);
-
+                        //updatedInfoVersion = true;
                         updatedVersionSuffix = true;
 
                     }
                 }
 
-                if (updatedVersion
-                    && updatedFileVersion
-                    && (objEditPt.AtEndOfDocument || string.IsNullOrEmpty(versionSuffix) || updatedVersionSuffix))
-                    break;
+                //check to see if the last line has already been processed
+                if (objEditPt.Line.Equals(endLine) && lastLine == true)
+                    break;//break the loop
 
                 objEditPt.LineDown();
                 objEditPt.StartOfLine();
+
+                //if the we're on the last line, allow one further loop to process the line
+                if (objEditPt.Line.Equals(endLine))
+                    lastLine = true;
 
             }
 
@@ -538,14 +595,14 @@ namespace DSoft.VersionChanger.Data
             return service;
         }
 
-        private ProjectVersion LoadVersionNumber(EnvDTE.Project project, ProjectItem projectItem, bool hasCocoa, bool hasAndroid)
+        private ProjectVersion LoadVersionNumber(EnvDTE.Project project, ProjectItem projectItem, bool hasCocoa, bool hasAndroid, bool hasUWP, bool isSdk)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
-            ProjectVersion result = null;
+            ProjectVersion result;
 
 
-            result = (projectItem == null) ? ProcessNewStyleProject(project) : ProcessOldStyleProject(project, projectItem);
+            result = (isSdk) ? ProcessNewStyleProject(project) : ProcessOldStyleProject(project, projectItem);
 
             if (result != null)
             {
@@ -557,6 +614,9 @@ namespace DSoft.VersionChanger.Data
 
                     var infoPlist = FindProjectItem(project.ProjectItems, "info.plist");
                     result.SecondaryProjectItem = infoPlist;
+
+                    if (infoPlist != null && infoPlist.Document != null)
+                        infoPlist.Document.Close();
                 }
                 else if (hasAndroid)
                 {
@@ -565,6 +625,21 @@ namespace DSoft.VersionChanger.Data
 
                     var aManifest = FindProjectItem(project.ProjectItems, "androidmanifest.xml");
                     result.SecondaryProjectItem = aManifest;
+
+                    if (aManifest != null && aManifest.Document != null)
+                        aManifest.Document.Close();
+                }
+                else if (hasUWP)
+                {
+                    result.IsUWP = true;
+                    result.ProjectType = "UWP";
+
+                    var packageManifest = FindProjectItem(project.ProjectItems, "package.appxmanifest");
+                    result.SecondaryProjectItem = packageManifest;
+
+                    if (packageManifest != null && packageManifest.Document != null)
+                        packageManifest.Document.Close();
+
 
                 }
 

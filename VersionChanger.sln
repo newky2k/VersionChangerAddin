@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.26228.4
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.32126.315
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VersionChanger", "VersionChanger\VersionChanger.csproj", "{8584CD23-33E8-4860-B41B-48795209CA5F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".external", ".external", "{EBFB0E9E-68BD-4558-8C34-F45E50C043DE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -26,7 +28,7 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {850ED202-2422-4D11-A561-8C0C7B8F7545}
 		VisualSVNWorkingCopyRoot = .
+		SolutionGuid = {850ED202-2422-4D11-A561-8C0C7B8F7545}
 	EndGlobalSection
 EndGlobal

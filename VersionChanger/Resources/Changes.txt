@@ -1,4 +1,19 @@
-﻿Changes in 2.3.0
+﻿Changes in 2.3.3
+  - Added support for UWP appxmanifest updates
+  - fixed issues with AssemblyInformationalVersion not being updated
+  - Enhanced support for Xamarin.Forms shared projects
+  - Minor UI changes
+  - Included support for SemVer version suffix
+
+Changes in 2.3.2
+  - Fixed packaging issues
+
+Changes in 2.3.1
+ - Fixed crashes when processing Sandcastle Help File Builder projects - Now ignores them
+ - Added null check to the ProjectItems count
+ - Added notification if there are no compatible projects found
+
+Changes in 2.3.0
  - Fixed issues with the loading of the projects
  - Fixed binding on the SeperateVersions checkbox
 

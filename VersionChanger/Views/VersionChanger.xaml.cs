@@ -84,5 +84,12 @@ namespace DSoft.VersionChanger.Views
         {
             hdrVersionSuffix.Visibility = mViewModel.ShowSemVer ? Visibility.Visible : Visibility.Hidden;
         }
-    }
+
+		private void OnClickCopidal(object sender, RoutedEventArgs e)
+		{
+            var url = "https://www.copidal.com";
+
+            System.Diagnostics.Process.Start(url);
+		}
+	}
 }

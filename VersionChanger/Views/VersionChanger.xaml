@@ -100,8 +100,8 @@
                                 <CheckBox Margin="5,0,0,10" IsChecked="{Binding ForceSemVer}" Checked="CheckBox_Checked" Unchecked="CheckBox_Checked" Content="Use SemVer 2.0" ToolTip="Will use Major, Minor, Build versions only for Assembly and File version. Will update nuget version for new style csproj files"/>
                             </StackPanel>
                             <Grid Grid.Row="2" HorizontalAlignment="Left">
-                                <Button Margin="0,0,0,0" Style="{StaticResource ChromelessButtonStyle}">
-                                    <Image Source="/VersionChanger;component/Resources/Copidal.png" />
+                                <Button Margin="0,0,0,0" Style="{StaticResource ChromelessButtonStyle}" Click="OnClickCopidal" Height="30">
+                                    <Image Source="/VersionChanger;component/Resources/Copidal.png"/>
                                 </Button>
                             </Grid>
                         </Grid>

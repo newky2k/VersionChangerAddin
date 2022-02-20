@@ -88,6 +88,7 @@
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="*" />
                                 <RowDefinition Height="Auto" />
+                                <RowDefinition Height="40" />
                             </Grid.RowDefinitions>
 
                             <StackPanel Grid.Row="0">
@@ -96,13 +97,18 @@
                             <StackPanel Grid.Row="1" VerticalAlignment="Bottom">
                                 <CheckBox Margin="5,0,0,5" IsChecked="{Binding UpdateClickOnce}" Content="Update ClickOnce"/>
                                 <CheckBox Margin="5,0,0,5" IsChecked="{Binding SeparateVersions}" Content="Use seperate versions"/>
-                                <CheckBox Margin="5,0,0,5" IsChecked="{Binding ForceSemVer}" Checked="CheckBox_Checked" Unchecked="CheckBox_Checked" Content="Use SemVer 2.0" ToolTip="Will use Major, Minor, Build versions only for Assembly and File version. Will update nuget version for new style csproj files"/>
+                                <CheckBox Margin="5,0,0,10" IsChecked="{Binding ForceSemVer}" Checked="CheckBox_Checked" Unchecked="CheckBox_Checked" Content="Use SemVer 2.0" ToolTip="Will use Major, Minor, Build versions only for Assembly and File version. Will update nuget version for new style csproj files"/>
                             </StackPanel>
+                            <Grid Grid.Row="2" HorizontalAlignment="Left">
+                                <Button Margin="0,0,0,0" Style="{StaticResource ChromelessButtonStyle}">
+                                    <Image Source="/VersionChanger;component/Resources/Copidal.png" />
+                                </Button>
+                            </Grid>
                         </Grid>
                         <Grid Grid.Column="1" VerticalAlignment="Top" Margin="0,5,0,5">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="*" />
-                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="40" />
                             </Grid.RowDefinitions>
                             <StackPanel Orientation="Vertical" HorizontalAlignment="Right">
                                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">

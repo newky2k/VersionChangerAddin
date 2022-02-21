@@ -1,10 +1,18 @@
-﻿Changes in 3.1.0.0
+﻿﻿Changes in 3.2.0
+  - Fixed issues with not updating VB.NET projects
+  - Fixed issues with not Updating <PackageVersion>
+  - Updated version logic for suffixes(if you include a + or - it will not attached a - at the begining)
+  - Code cleanup
+  - Changed theme
+  - Add some branding for Copidal(a company that i've setup)
+
+Changes in 3.1.0
   - Added support for UWP package.appxmanifest files
   - Improved support for Xamarin.Forms shared projects
   - Added support for InformationalVersion in SDK style projects
   - Fixed issues with AssemblyInformationalVersion in .NET Framework projects
   - Minor UI changes
 
-Changes in 3.0.0.0
+Changes in 3.0.0
   - Updated to work with Visual Studio 2022+
   - Included support for SemVer version suffix

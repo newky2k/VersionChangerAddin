@@ -1,4 +1,12 @@
-﻿Changes in 2.3.3
+﻿Changes in 2.3.4
+  - Fixed issues with not updating VB.NET projects
+  - Fixed issues with not Updating <PackageVersion>
+  - Updated version logic for suffixes(if you include a + or - it will not attached a - at the begining)
+  - Code cleanup
+  - Changed theme
+  - Add some branding for Copidal(a company that i've setup)
+
+Changes in 2.3.3
   - Added support for UWP appxmanifest updates
   - fixed issues with AssemblyInformationalVersion not being updated
   - Enhanced support for Xamarin.Forms shared projects

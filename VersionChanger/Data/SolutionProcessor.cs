@@ -1,4 +1,5 @@
-﻿using EnvDTE;
+﻿using DSoft.VersionChanger.Helpers;
+using EnvDTE;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Flavor;
 using Microsoft.VisualStudio.Shell.Interop;
@@ -160,51 +161,61 @@ namespace DSoft.VersionChanger.Data
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
-            
             foreach (Property aProp in realProject.Properties)
             {
-                if (aProp.Name.ToLower().Equals("assemblyversion"))
+                var lowerCase = aProp.Name.ToLower();
+
+                if (lowerCase.Equals("assemblyversion"))
                 {
                     aProp.Value = (newVersion.Revision == -1) ? newVersion.ToString(3) : newVersion.ToString();
                 }
-                else if (aProp.Name.ToLower().Equals("fileversion"))
+                else if (lowerCase.Equals("fileversion"))
                 {
                     var fVersion = (fileVersion == null) ? newVersion : fileVersion;
 
                     aProp.Value = (fVersion.Revision == -1) ? fVersion.ToString(3) : fVersion.ToString();
                 }
-                else if (aProp.Name.ToLower().Equals("version"))
+                else if (lowerCase.Equals("version"))
                 {
-                    var str = (newVersion.Revision == -1) ? newVersion.ToString(3) : newVersion.ToString();
-                    if (string.IsNullOrEmpty(versionSuffix) == false) str += $"-{versionSuffix}";
+                    var str = VersionHelper.CalculateVersion(newVersion, versionSuffix);
+
                     aProp.Value = str;
 
                 }
-                else if (aProp.Name.ToLower().Equals("versionsuffix"))
+                else if (lowerCase.Equals("versionsuffix"))
                 {
                     aProp.Value = versionSuffix;
                 }
-                else if (aProp.Name.Equals("packageversion", StringComparison.OrdinalIgnoreCase))
+                else if (lowerCase.Equals("packageversion", StringComparison.OrdinalIgnoreCase))
                 {
-                    aProp.Value = (newVersion.Revision == -1) ? newVersion.ToString(3) : newVersion.ToString();
+                    var str = VersionHelper.CalculateVersion(newVersion, versionSuffix);
+
+                    aProp.Value = str;
 
                 }
-                else if (aProp.Name.ToLower().Equals("assemblyinformationalversion") || aProp.Name.ToLower().Equals("informationalversion"))
+                else if (lowerCase.Equals("assemblyinformationalversion") || aProp.Name.ToLower().Equals("informationalversion"))
                 {
-                    aProp.Value = (newVersion.Revision == -1) ? newVersion.ToString(3) : newVersion.ToString();
+                    var str = VersionHelper.CalculateVersion(newVersion, versionSuffix);
+
+                    aProp.Value = str;
+
                 }
             }
 
             realProject.Save();
 
+
+            //Update some properties via the xml, such as InformationalVersion
             var txt = File.ReadAllLines(realProject.FileName);
             var searchableText = string.Join("", txt);
 
             var seachText = "InformationalVersion";
+            var seachText2 = "PackageVersion";
 
             var outPutLines = new List<string>();
 
-            if (searchableText.Contains("InformationalVersion"))
+            //update informational version and package version
+            if (searchableText.Contains(seachText) || searchableText.Contains(seachText2))
             {
                 foreach (var aLine in txt)
                 {
@@ -219,9 +230,27 @@ namespace DSoft.VersionChanger.Data
                         {
                             newLine = newLine.Substring(0, pos + (seachText.Length + 2));
 
-                            newLine += (newVersion.Revision == -1) ? newVersion.ToString(3) : newVersion.ToString();
+                            newLine += VersionHelper.CalculateVersion(newVersion, versionSuffix);
 
                             newLine += $"</{seachText}>";
+
+                            outPutLines.Add(newLine);
+                        }
+                    }
+                    else if (aLine.Contains($"<{seachText2}>"))
+                    {
+                        var newLine = aLine;
+
+                        var pos = newLine.IndexOf($"<{seachText2}>");
+                        var closer = newLine.IndexOf($"</{seachText2}>");
+
+                        if (pos != -1 && closer != -1)
+                        {
+                            newLine = newLine.Substring(0, pos + (seachText2.Length + 2));
+
+                            newLine += VersionHelper.CalculateVersion(newVersion, versionSuffix);
+
+                            newLine += $"</{seachText2}>";
 
                             outPutLines.Add(newLine);
                         }
@@ -230,10 +259,11 @@ namespace DSoft.VersionChanger.Data
                     {
                         outPutLines.Add(aLine);
                     }
-                }
-
-                File.WriteAllLines(realProject.FileName, outPutLines);
+                }  
             }
+
+            if (outPutLines.Count > 0) //only write if changes occured
+                File.WriteAllLines(realProject.FileName, outPutLines);
         }
 
         /// <summary>
@@ -270,8 +300,6 @@ namespace DSoft.VersionChanger.Data
                 newFileVersion = newAssemblyVersion;
             }
 
-
-            var updatedVersionSuffix = false;
             var endLine = endPpint.Line;
 
             var lastLine = false;
@@ -286,101 +314,85 @@ namespace DSoft.VersionChanger.Data
                         && !aLine.StartsWith("'"))
                 {
 
-                    if (aLine.Contains(searchText) && aLine.Contains(assemblyText))
+                    if (aLine.ToLower().Contains(assemblyText))
                     {
-                        //now get the version number
-                        int locationStart = aLine.IndexOf(searchText);
-                        var searchLength = searchText.Length;
-
-                        string initail = aLine.Substring((locationStart + searchText.Length));
-                        var openerlocationStart = initail.IndexOf(searchVstart);
-
-                        searchLength += (openerlocationStart + searchVstart.Length);
-                        //locationStart += openerlocationStart;
-
-                        string firstBit = aLine.Substring(0, (locationStart + searchLength));
-                        string remaining = aLine.Substring((locationStart + searchLength));
-                        int locationEnd = remaining.IndexOf("\"");
-                        string end = remaining.Substring(locationEnd);
-
-                        var newVersionValue = (newAssemblyVersion.Revision == -1) ? $"{newAssemblyVersion.Major}.{newAssemblyVersion.Minor}.{newAssemblyVersion.Build}.0" : newAssemblyVersion.ToString();
-
-
-                        var newLine = String.Format("{0}{1}{2}", firstBit, newVersionValue, end);
-
-                        objEditPt.ReplaceText(objEditPt.LineLength, newLine, (int)vsEPReplaceTextOptions.vsEPReplaceTextKeepMarkers);
-
-                        var aLine2 = objEditPt.GetText(objEditPt.LineLength);
-
-                        //Console.WriteLine(aLine2);
-                        //updatedVersion = true;
-                    }
-
-                    if (aLine.Contains(searchText2) && aLine.Contains(assemblyText))
-                    {
-                        int locationStart = aLine.IndexOf(searchText2);
-                        var searchLength = searchText2.Length;
-
-                        string initail = aLine.Substring((locationStart + searchText2.Length));
-                        var openerlocationStart = initail.IndexOf(searchVstart);
-
-                        searchLength += (openerlocationStart + searchVstart.Length);
-
-                        string firstBit = aLine.Substring(0, (locationStart + searchLength));
-                        string remaining = aLine.Substring((locationStart + searchLength));
-                        int locationEnd = remaining.IndexOf("\"");
-                        string end = remaining.Substring(locationEnd);
-
-                        var newFileVersionValue = (newFileVersion.Revision == -1) ? $"{newFileVersion.Major}.{newFileVersion.Minor}.{newFileVersion.Build}.0" : newFileVersion.ToString();
-
-                        var newLine = String.Format("{0}{1}{2}", firstBit, newFileVersionValue.ToString(), end);
-
-
-                        objEditPt.ReplaceText(objEditPt.LineLength, newLine, (int)vsEPReplaceTextOptions.vsEPReplaceTextKeepMarkers);
-
-                        var aLine2 = objEditPt.GetText(objEditPt.LineLength);
-
-                        //Console.WriteLine(aLine2);
-
-                        //updatedFileVersion = true;
-
-                    }
-
-                    if (aLine.Contains(searchText3) && aLine.Contains(assemblyText))
-                    {
-                        int locationStart = aLine.IndexOf(searchText3);
-                        var searchLength = searchText3.Length;
-
-                        string initail = aLine.Substring((locationStart + searchText3.Length));
-                        var openerlocationStart = initail.IndexOf(searchVstart);
-
-                        searchLength += (openerlocationStart + searchVstart.Length);
-
-                        string firstBit = aLine.Substring(0, (locationStart + searchLength));
-                        string remaining = aLine.Substring((locationStart + searchLength));
-                        int locationEnd = remaining.IndexOf("\"");
-                        string end = remaining.Substring(locationEnd);
-
-                        var newFileVersionValue = (newFileVersion.Revision == -1) ? $"{newFileVersion.Major}.{newFileVersion.Minor}.{newFileVersion.Build}.0" : newFileVersion.ToString();
-
-                        if (string.IsNullOrEmpty(versionSuffix) == false)
+                        if (aLine.Contains(searchText))
                         {
-                            // overriding for semver
-                            newFileVersionValue += $"-{versionSuffix}";
+                            //now get the version number
+                            int locationStart = aLine.IndexOf(searchText);
+                            var searchLength = searchText.Length;
+
+                            string initail = aLine.Substring((locationStart + searchText.Length));
+                            var openerlocationStart = initail.IndexOf(searchVstart);
+
+                            searchLength += (openerlocationStart + searchVstart.Length);
+                            //locationStart += openerlocationStart;
+
+                            string firstBit = aLine.Substring(0, (locationStart + searchLength));
+                            string remaining = aLine.Substring((locationStart + searchLength));
+                            int locationEnd = remaining.IndexOf("\"");
+                            string end = remaining.Substring(locationEnd);
+
+                            var newVersionValue = VersionHelper.CalculateVersion(newAssemblyVersion, includeZeroRevision: true);
+
+                            var newLine = string.Format("{0}{1}{2}", firstBit, newVersionValue, end);
+
+                            objEditPt.ReplaceText(objEditPt.LineLength, newLine, (int)vsEPReplaceTextOptions.vsEPReplaceTextKeepMarkers);
+
                         }
 
-                        var newLine = String.Format("{0}{1}{2}", firstBit, newFileVersionValue.ToString(), end);
+                        if (aLine.Contains(searchText2))
+                        {
+                            int locationStart = aLine.IndexOf(searchText2);
+                            var searchLength = searchText2.Length;
+
+                            string initail = aLine.Substring((locationStart + searchText2.Length));
+                            var openerlocationStart = initail.IndexOf(searchVstart);
+
+                            searchLength += (openerlocationStart + searchVstart.Length);
+
+                            string firstBit = aLine.Substring(0, (locationStart + searchLength));
+                            string remaining = aLine.Substring((locationStart + searchLength));
+                            int locationEnd = remaining.IndexOf("\"");
+                            string end = remaining.Substring(locationEnd);
 
 
-                        objEditPt.ReplaceText(objEditPt.LineLength, newLine, (int)vsEPReplaceTextOptions.vsEPReplaceTextKeepMarkers);
+                            var newFileVersionValue = VersionHelper.CalculateVersion(newFileVersion, includeZeroRevision: true);
 
-                        var aLine2 = objEditPt.GetText(objEditPt.LineLength);
+                            var newLine = string.Format("{0}{1}{2}", firstBit, newFileVersionValue.ToString(), end);
 
-                        //Console.WriteLine(aLine2);
-                        //updatedInfoVersion = true;
-                        updatedVersionSuffix = true;
+                           objEditPt.ReplaceText(objEditPt.LineLength, newLine, (int)vsEPReplaceTextOptions.vsEPReplaceTextKeepMarkers);
 
+
+                        }
+
+                        if (aLine.Contains(searchText3))
+                        {
+                            int locationStart = aLine.IndexOf(searchText3);
+                            var searchLength = searchText3.Length;
+
+                            string initail = aLine.Substring((locationStart + searchText3.Length));
+                            var openerlocationStart = initail.IndexOf(searchVstart);
+
+                            searchLength += (openerlocationStart + searchVstart.Length);
+
+                            string firstBit = aLine.Substring(0, (locationStart + searchLength));
+                            string remaining = aLine.Substring((locationStart + searchLength));
+                            int locationEnd = remaining.IndexOf("\"");
+                            string end = remaining.Substring(locationEnd);
+
+                            var newFileVersionValue = VersionHelper.CalculateVersion(newFileVersion, versionSuffix, true);
+
+                            var newLine = string.Format("{0}{1}{2}", firstBit, newFileVersionValue.ToString(), end);
+
+
+                            objEditPt.ReplaceText(objEditPt.LineLength, newLine, (int)vsEPReplaceTextOptions.vsEPReplaceTextKeepMarkers);
+
+                            //var aLine2 = objEditPt.GetText(objEditPt.LineLength);
+
+                        }
                     }
+
                 }
 
                 //check to see if the last line has already been processed
@@ -396,13 +408,13 @@ namespace DSoft.VersionChanger.Data
 
             }
 
-            if (updatedVersionSuffix == false && string.IsNullOrEmpty(versionSuffix) == false)
-            {
-                var newFileVersionValue = (newFileVersion.Revision == -1) ? $"{newFileVersion.Major}.{newFileVersion.Minor}.{newFileVersion.Build}.0" : newFileVersion.ToString();
-                newFileVersionValue += $"-{versionSuffix}";
-                var newLine = String.Format("[assembly: AssemblyInformationalVersion(\"{0}\")]\r\n", newFileVersionValue);
-                objEditPt.Insert(newLine);
-            }
+            //if (updatedVersionSuffix == false && string.IsNullOrEmpty(versionSuffix) == false)
+            //{
+            //    var newFileVersionValue = (newFileVersion.Revision == -1) ? $"{newFileVersion.Major}.{newFileVersion.Minor}.{newFileVersion.Build}.0" : newFileVersion.ToString();
+            //    newFileVersionValue += $"-{versionSuffix}";
+            //    var newLine = String.Format("[assembly: AssemblyInformationalVersion(\"{0}\")]\r\n", newFileVersionValue);
+            //    objEditPt.Insert(newLine);
+            //}
 
             item.Save();
             aDoc.Close();
@@ -435,7 +447,7 @@ namespace DSoft.VersionChanger.Data
                 if (proj.FullName == "")
                 {
                     //folder
-                    int count = proj.ProjectItems.Count;
+                    //int count = proj.ProjectItems.Count;
 
                     AddSubProjects(proj, projectst);
                 }
@@ -465,7 +477,7 @@ namespace DSoft.VersionChanger.Data
             if (Proj.FullName == "")
             {
                 //folder
-                int count = Proj.ProjectItems.Count;
+                //int count = Proj.ProjectItems.Count;
 
                 foreach (ProjectItem proj2 in Proj.ProjectItems)
                 {
@@ -559,7 +571,7 @@ namespace DSoft.VersionChanger.Data
 
         }
 
-        public object GetService(object serviceProvider, System.Type type)
+        public object GetService(object serviceProvider, Type type)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 

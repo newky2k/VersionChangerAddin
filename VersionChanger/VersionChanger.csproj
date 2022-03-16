@@ -85,6 +85,7 @@
     <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Guids.cs" />
+    <Compile Include="Helpers\VersionHelper.cs" />
     <Compile Include="PkgCmdID.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="VersionChanger.cs" />
@@ -107,6 +108,7 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
+    <Resource Include="Resources\Copidal.png" />
     <Content Include="Resources\Images.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

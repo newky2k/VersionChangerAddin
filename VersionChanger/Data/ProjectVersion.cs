@@ -11,17 +11,23 @@ namespace DSoft.VersionChanger.Data
     /// </summary>
     public class ProjectVersion : NotifyableObject
     {
-        private bool m_Update  = true;
+		#region Fields
+
+
+		private bool m_Update  = true;
         private String m_Name;
         private String m_Path;
         private Version m_AssemblyVersion;
         private Version mFileVersion;
         private string _version;
         private string _versionSuffix;
-
         private bool isNewStyleProject;
+		#endregion
 
-        public bool IsNewStyleProject
+		#region Properties
+
+
+		public bool IsNewStyleProject
         {
             get { return isNewStyleProject; }
             set { isNewStyleProject = value; }
@@ -55,7 +61,7 @@ namespace DSoft.VersionChanger.Data
         /// <value>
         /// The name.
         /// </value>
-        public String Name
+        public string Name
         {
             get
             {
@@ -110,7 +116,7 @@ namespace DSoft.VersionChanger.Data
             {
                 m_AssemblyVersion = value;
 
-                PropertyDidChange("Version");
+                PropertyDidChange(nameof(AssemblyVersion));
             }
         }
 
@@ -161,7 +167,8 @@ namespace DSoft.VersionChanger.Data
         {
             get
             {
-                if (mFileVersion == null) m_AssemblyVersion = new Version("0, 0, 0, 0");
+                if (mFileVersion == null) 
+                    m_AssemblyVersion = new Version("0, 0, 0, 0");
 
                 return mFileVersion;
             }
@@ -170,7 +177,7 @@ namespace DSoft.VersionChanger.Data
             {
                 mFileVersion = value;
 
-                PropertyDidChange("VeFileVersionrsion");
+                PropertyDidChange(nameof(FileVersion));
             }
         }
 
@@ -217,6 +224,8 @@ namespace DSoft.VersionChanger.Data
             get { return _ProjectType; }
             set { _ProjectType = value; }
         }
+
+        #endregion
 
         public ProjectVersion()
         {

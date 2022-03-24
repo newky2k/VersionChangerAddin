@@ -36,7 +36,8 @@ namespace DSoft.VersionChanger.Views
 
             this.DataContext = mViewModel;
 
-            CheckBox_Checked(this, null);
+            OnUseSemVerChecked(this, null);
+            OnUseSeperateVersionsChanged(this, null);
         }
 
         private void OnBeginClicked(object sender, RoutedEventArgs e)
@@ -67,12 +68,29 @@ namespace DSoft.VersionChanger.Views
 
         private void OnLoaded(object sender, RoutedEventArgs e)
         {
-           if (mViewModel.Items.Count == 0 && mViewModel.Errors.Count == 0)
-            {
-                MessageBox.Show("There were no compatible projects found in the solution");
+            mViewModel.IsBusy = true;
 
-                this.DialogResult = true;
-            }
+            Task.Run(() =>
+            {
+                ThreadHelper.JoinableTaskFactory.Run(async delegate {
+                    await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+
+                    if (mViewModel.IsLoaded == false)
+                    {
+                        mViewModel.LoadProjects();
+                    }
+
+                    if (mViewModel.Items.Count == 0 && mViewModel.Errors.Count == 0)
+                    {
+                        MessageBox.Show("There were no compatible projects found in the solution");
+
+                        this.DialogResult = true;
+                    }
+                });
+
+                
+            });
+           
         }
 
         private void FilterClick(object sender, RoutedEventArgs e)
@@ -80,7 +98,7 @@ namespace DSoft.VersionChanger.Views
             mViewModel.FilterProjects();
         }
 
-        private void CheckBox_Checked(object sender, RoutedEventArgs e)
+        private void OnUseSemVerChecked(object sender, RoutedEventArgs e)
         {
             hdrVersionSuffix.Visibility = mViewModel.ShowSemVer ? Visibility.Visible : Visibility.Hidden;
         }
@@ -91,5 +109,11 @@ namespace DSoft.VersionChanger.Views
 
             System.Diagnostics.Process.Start(url);
 		}
+
+		private void OnUseSeperateVersionsChanged(object sender, RoutedEventArgs e)
+		{
+            hdrFileVersion.Visibility = mViewModel.SeparateVersions ? Visibility.Visible : Visibility.Hidden;
+
+        }
 	}
 }

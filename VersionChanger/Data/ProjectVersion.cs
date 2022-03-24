@@ -22,12 +22,14 @@ namespace DSoft.VersionChanger.Data
         private string _version;
         private string _versionSuffix;
         private bool isNewStyleProject;
-		#endregion
+        private string _ProjectType;
 
-		#region Properties
+        #endregion
+
+        #region Properties
 
 
-		public bool IsNewStyleProject
+        public bool IsNewStyleProject
         {
             get { return isNewStyleProject; }
             set { isNewStyleProject = value; }
@@ -181,6 +183,15 @@ namespace DSoft.VersionChanger.Data
             }
         }
 
+        public string FileVersionValue
+        {
+            get
+            {
+                return (FileVersion.Revision <= 0) ? $"{FileVersion.Major}.{FileVersion.Minor}.{FileVersion.Build}" : FileVersion.ToString();
+            }
+
+        }
+
         /// <summary>
         /// Gets or sets the real project.
         /// </summary>
@@ -217,8 +228,7 @@ namespace DSoft.VersionChanger.Data
 
         public ProjectItem SecondaryProjectItem { get; set; }
 
-        private string _ProjectType;
-
+       
         public string ProjectType
         {
             get { return _ProjectType; }

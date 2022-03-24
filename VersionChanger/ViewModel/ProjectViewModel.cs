@@ -425,50 +425,64 @@ namespace DSoft.VersionChanger.ViewModel
             forceSemVer = SettingsControl.GetBooleanValue("ForceSemVer");
             _updateNuget = SettingsControl.GetBooleanValue("UpdateNuget");
 
-            LoadProjects();
+            //LoadProjects();
         }
         #endregion
 
         #region Methods
         public void LoadProjects()
         {
-            ThreadHelper.ThrowIfNotOnUIThread();
+			try
+			{
+                ThreadHelper.ThrowIfNotOnUIThread();
 
-            using (var solutionProcessor = new SolutionProcessor(mCurrentSolution))
-            {
-                var projVers = solutionProcessor.BuildVersions(mCurrentSolution);
-                ShowUnloadedWarning = solutionProcessor.DetectedUnloadedProjects;
-                FailedProjects = solutionProcessor.FailedProjects;
+               
 
-                foreach (var item in projVers.OrderBy(projver => projver.Name))
+                using (var solutionProcessor = new SolutionProcessor(mCurrentSolution))
                 {
-                    this.Items.Add(item);
+                    var projVers = solutionProcessor.BuildVersions(mCurrentSolution);
+                    ShowUnloadedWarning = solutionProcessor.DetectedUnloadedProjects;
+                    FailedProjects = solutionProcessor.FailedProjects;
+
+                    foreach (var item in projVers.OrderBy(projver => projver.Name))
+                    {
+                        this.Items.Add(item);
+                    }
+
+
+                    ShowIos = projVers.HasIosMac;
+                    ShowAndroid = projVers.HasAndroid;
+
+                    Version outVersion = null;
+
+                    if (System.Version.TryParse(AssemblyVersion, out outVersion))
+                    {
+                        if (ShowIos)
+                        {
+                            CocoaShortVersion = CocoaAppVersion.ToShortVersion(outVersion);
+                        }
+
+                        if (ShowAndroid)
+                        {
+                            AndroidBuild = AndroidAppVersion.ToBuild(outVersion);
+                        }
+                    }
                 }
 
 
-                ShowIos = projVers.HasIosMac;
-                ShowAndroid = projVers.HasAndroid;
+                LoadAssVersion();
 
-                Version outVersion = null;
+                LoadAssFileVersion();
 
-                if (System.Version.TryParse(AssemblyVersion, out outVersion))
-                {
-                    if (ShowIos)
-                    {
-                        CocoaShortVersion = CocoaAppVersion.ToShortVersion(outVersion);
-                    }
+                IsLoaded = true;
 
-                    if (ShowAndroid)
-                    {
-                        AndroidBuild = AndroidAppVersion.ToBuild(outVersion);
-                    }
-                }
+                IsBusy = false;
             }
+			catch (Exception ex)
+			{
+                System.Windows.MessageBox.Show(ex.Message, "Error loading projects");
+			}
 
-
-            LoadAssVersion();
-
-            LoadAssFileVersion();
         }
         public void ProcessUpdates()
         {

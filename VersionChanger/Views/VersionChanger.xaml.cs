@@ -15,6 +15,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 
 namespace DSoft.VersionChanger.Views
 {
@@ -36,8 +37,30 @@ namespace DSoft.VersionChanger.Views
 
             this.DataContext = mViewModel;
 
+			mViewModel.LoadingProgressUpdated += MViewModel_LoadingProgressUpdated;
+
             OnUseSemVerChecked(this, null);
             OnUseSeperateVersionsChanged(this, null);
+        }
+
+		private void MViewModel_LoadingProgressUpdated(object sender, EventArgs e)
+		{
+            Dispatcher.Invoke(DispatcherPriority.Background, new Action(delegate { this.UpdateLayout(); }));
+
+   //         Dispatcher.Invoke((Action)(() =>
+			//{
+   //             txtProjectsLoading.Text = mViewModel.LoadingProjectsText;
+   //         }));
+
+			//ThreadHelper.JoinableTaskFactory.Run(async delegate {
+   //             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+
+   //             await Task.Delay(1000);
+
+               
+                
+   //         });
+
         }
 
         private void OnBeginClicked(object sender, RoutedEventArgs e)

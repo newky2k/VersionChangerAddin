@@ -47,6 +47,8 @@ namespace DSoft.VersionChanger.ViewModel
         private string _assemblyFileBuild;
         #endregion
 
+        public event EventHandler LoadingProgressUpdated = delegate { };
+
         #region Properties
 
         #region AssemblyVersion
@@ -427,19 +429,68 @@ namespace DSoft.VersionChanger.ViewModel
 
             //LoadProjects();
         }
-        #endregion
 
-        #region Methods
-        public void LoadProjects()
+        private int _totalProjects;
+        private int _currentProject;
+        private string _currentProjectName;
+
+        public string LoadingProjectsText
+		{
+			get { return $"Loading project {CurrentProject} of {TotalProjects}"; }
+		}
+
+
+		public int CurrentProject
+		{
+			get { return _currentProject; }
+			set { _currentProject = value; PropertyDidChange(nameof(CurrentProject)); PropertyDidChange(nameof(LoadingProjectsText)); }
+		}
+
+
+
+		public string CurrentProjectName
+		{
+			get { return _currentProjectName; }
+			set { _currentProjectName = value; PropertyDidChange(nameof(CurrentProjectName)); }
+		}
+
+
+		public int TotalProjects
+		{
+			get { return _totalProjects; }
+			set { _totalProjects = value; PropertyDidChange(nameof(TotalProjects)); PropertyDidChange(nameof(LoadingProjectsText)); }
+		}
+
+
+		#endregion
+
+		#region Methods
+		public void LoadProjects()
         {
 			try
 			{
                 ThreadHelper.ThrowIfNotOnUIThread();
 
-               
+                
 
                 using (var solutionProcessor = new SolutionProcessor(mCurrentSolution))
                 {
+
+                    solutionProcessor.OnLoadedProjects += (s, e) =>
+                    {
+                        TotalProjects = e;
+
+                        LoadingProgressUpdated(this, null);
+                    };
+
+                    solutionProcessor.OnStartingProject += (s, e) =>
+                    {
+                        CurrentProject = e.Item1;
+                        CurrentProjectName = e.Item2;
+
+                        LoadingProgressUpdated(this, null);
+                    };
+
                     var projVers = solutionProcessor.BuildVersions(mCurrentSolution);
                     ShowUnloadedWarning = solutionProcessor.DetectedUnloadedProjects;
                     FailedProjects = solutionProcessor.FailedProjects;

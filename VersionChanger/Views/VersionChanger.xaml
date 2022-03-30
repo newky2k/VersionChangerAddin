@@ -240,8 +240,17 @@
 
         </Grid>
         <Grid Background="#55222222" Visibility="{Binding IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}" >
-            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="48" Foreground="Black">Loading projects....</TextBlock>
-            <TextBlock Margin="-1,-1,0,0" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="48" Foreground="White">Loading projects....</TextBlock>
+
+            <Border CornerRadius="5" Background="WhiteSmoke" HorizontalAlignment="Center" VerticalAlignment="Center" BorderBrush="Black" BorderThickness="1,1,1,1">
+                <StackPanel Margin="10,10,10,10" Width="400" Height="100">
+                    <TextBlock Margin="0,0,0,10" FontWeight="Bold" Foreground="Black">Version Changer</TextBlock>
+                    <TextBlock x:Name="txtProjectsLoading" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="Black" Text="{Binding LoadingProjectsText, FallbackValue=Loading...}"/>
+                    <TextBlock Margin="0,5,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="Black" Text="{Binding CurrentProjectName, FallbackValue=Loading...}"/>
+                    <ProgressBar x:Name="pgrProgress" Height="24" Margin="0,10,0,0" Minimum="0" Maximum="{Binding TotalProjects}" Value="{Binding CurrentProject}"/>
+                </StackPanel>
+
+            </Border>
+
         </Grid>
     </Grid>
  

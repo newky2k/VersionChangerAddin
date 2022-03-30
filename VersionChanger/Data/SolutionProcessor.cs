@@ -21,6 +21,11 @@ namespace DSoft.VersionChanger.Data
     /// </summary>
     public class SolutionProcessor : IDisposable
     {
+
+        public event EventHandler<int> OnLoadedProjects = delegate { };
+
+        public event EventHandler<Tuple<int, string>> OnStartingProject = delegate { };
+
         public bool DetectedUnloadedProjects { get; set; }
 
         private List<FailedProject> _failedProjects;
@@ -58,11 +63,21 @@ namespace DSoft.VersionChanger.Data
 
             var projs = FindProjects(MainSolution);
 
+            OnLoadedProjects(this, projs.Count);
+
+           
+
             try
             {
+                var loopPosition = 0;
+
                 foreach (Project proj in projs)
                 {
-                    if (!String.IsNullOrEmpty(proj.FileName) 
+                    loopPosition++;
+
+                    OnStartingProject.Invoke(this, new Tuple<int, string>(loopPosition, proj.Name));
+
+                    if (!string.IsNullOrEmpty(proj.FileName) 
                         && proj.ProjectItems != null)
                     {
                         
@@ -91,9 +106,9 @@ namespace DSoft.VersionChanger.Data
                                 continue;
                             }
 
-                            var iOSTypes = new List<String> { "{FEACFBD2-3405-455C-9665-78FE426C6842}", "{EE2C853D-36AF-4FDB-B1AD-8E90477E2198}" };
-                            var androidTypes = new List<String> { "{EFBA0AD7-5A72-4C68-AF49-83D382785DCF}", "{10368E6C-D01B-4462-8E8B-01FC667A7035}" };
-                            var macTypes = new List<String> { "{A3F8F2AB-B479-4A4A-A458-A89E7DC349F1}", "{EE2C853D-36AF-4FDB-B1AD-8E90477E2198}" };
+                            var iOSTypes = new List<string> { "{FEACFBD2-3405-455C-9665-78FE426C6842}", "{EE2C853D-36AF-4FDB-B1AD-8E90477E2198}" };
+                            var androidTypes = new List<string> { "{EFBA0AD7-5A72-4C68-AF49-83D382785DCF}", "{10368E6C-D01B-4462-8E8B-01FC667A7035}" };
+                            var macTypes = new List<string> { "{A3F8F2AB-B479-4A4A-A458-A89E7DC349F1}", "{EE2C853D-36AF-4FDB-B1AD-8E90477E2198}" };
                             var uwpTypes = new List<string> { "{A5A43C5B-DE2A-4C0C-9213-0A381AF9435A}" };
 
                             if (iOSTypes.Contains(projectTypeGuids.First()) || macTypes.Contains(projectTypeGuids.First()))

@@ -47,6 +47,8 @@ namespace DSoft.VersionChanger.ViewModel
         private string _assemblyFileBuild;
         #endregion
 
+        public event EventHandler LoadingProgressUpdated = delegate { };
+
         #region Properties
 
         #region AssemblyVersion
@@ -425,50 +427,113 @@ namespace DSoft.VersionChanger.ViewModel
             forceSemVer = SettingsControl.GetBooleanValue("ForceSemVer");
             _updateNuget = SettingsControl.GetBooleanValue("UpdateNuget");
 
-            LoadProjects();
+            //LoadProjects();
         }
-        #endregion
 
-        #region Methods
-        public void LoadProjects()
+        private int _totalProjects;
+        private int _currentProject;
+        private string _currentProjectName;
+
+        public string LoadingProjectsText
+		{
+			get { return $"Loading project {CurrentProject} of {TotalProjects}"; }
+		}
+
+
+		public int CurrentProject
+		{
+			get { return _currentProject; }
+			set { _currentProject = value; PropertyDidChange(nameof(CurrentProject)); PropertyDidChange(nameof(LoadingProjectsText)); }
+		}
+
+
+
+		public string CurrentProjectName
+		{
+			get { return _currentProjectName; }
+			set { _currentProjectName = value; PropertyDidChange(nameof(CurrentProjectName)); }
+		}
+
+
+		public int TotalProjects
+		{
+			get { return _totalProjects; }
+			set { _totalProjects = value; PropertyDidChange(nameof(TotalProjects)); PropertyDidChange(nameof(LoadingProjectsText)); }
+		}
+
+
+		#endregion
+
+		#region Methods
+		public void LoadProjects()
         {
-            ThreadHelper.ThrowIfNotOnUIThread();
+			try
+			{
+                ThreadHelper.ThrowIfNotOnUIThread();
 
-            using (var solutionProcessor = new SolutionProcessor(mCurrentSolution))
-            {
-                var projVers = solutionProcessor.BuildVersions(mCurrentSolution);
-                ShowUnloadedWarning = solutionProcessor.DetectedUnloadedProjects;
-                FailedProjects = solutionProcessor.FailedProjects;
+                
 
-                foreach (var item in projVers.OrderBy(projver => projver.Name))
+                using (var solutionProcessor = new SolutionProcessor(mCurrentSolution))
                 {
-                    this.Items.Add(item);
+
+                    solutionProcessor.OnLoadedProjects += (s, e) =>
+                    {
+                        TotalProjects = e;
+
+                        LoadingProgressUpdated(this, null);
+                    };
+
+                    solutionProcessor.OnStartingProject += (s, e) =>
+                    {
+                        CurrentProject = e.Item1;
+                        CurrentProjectName = e.Item2;
+
+                        LoadingProgressUpdated(this, null);
+                    };
+
+                    var projVers = solutionProcessor.BuildVersions(mCurrentSolution);
+                    ShowUnloadedWarning = solutionProcessor.DetectedUnloadedProjects;
+                    FailedProjects = solutionProcessor.FailedProjects;
+
+                    foreach (var item in projVers.OrderBy(projver => projver.Name))
+                    {
+                        this.Items.Add(item);
+                    }
+
+
+                    ShowIos = projVers.HasIosMac;
+                    ShowAndroid = projVers.HasAndroid;
+
+                    Version outVersion = null;
+
+                    if (System.Version.TryParse(AssemblyVersion, out outVersion))
+                    {
+                        if (ShowIos)
+                        {
+                            CocoaShortVersion = CocoaAppVersion.ToShortVersion(outVersion);
+                        }
+
+                        if (ShowAndroid)
+                        {
+                            AndroidBuild = AndroidAppVersion.ToBuild(outVersion);
+                        }
+                    }
                 }
 
 
-                ShowIos = projVers.HasIosMac;
-                ShowAndroid = projVers.HasAndroid;
+                LoadAssVersion();
 
-                Version outVersion = null;
+                LoadAssFileVersion();
 
-                if (System.Version.TryParse(AssemblyVersion, out outVersion))
-                {
-                    if (ShowIos)
-                    {
-                        CocoaShortVersion = CocoaAppVersion.ToShortVersion(outVersion);
-                    }
+                IsLoaded = true;
 
-                    if (ShowAndroid)
-                    {
-                        AndroidBuild = AndroidAppVersion.ToBuild(outVersion);
-                    }
-                }
+                IsBusy = false;
             }
+			catch (Exception ex)
+			{
+                System.Windows.MessageBox.Show(ex.Message, "Error loading projects");
+			}
 
-
-            LoadAssVersion();
-
-            LoadAssFileVersion();
         }
         public void ProcessUpdates()
         {

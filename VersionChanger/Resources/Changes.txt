@@ -1,4 +1,10 @@
-﻿Changes in 2.3.4
+﻿Changes in 2.3.5
+  - Fixed binding issues with the File Version when using seperate version numbers
+  - Updates to the loading of projects so that the window is shown immediately and the loading progress can be seen
+  - Fixed layout of the IOS and Android version fields
+  - Tweaked the design of the panels to seperate the projects list and the options panel
+
+Changes in 2.3.4
   - Fixed issues with not updating VB.NET projects
   - Fixed issues with not Updating <PackageVersion>
   - Updated version logic for suffixes(if you include a + or - it will not attached a - at the begining)

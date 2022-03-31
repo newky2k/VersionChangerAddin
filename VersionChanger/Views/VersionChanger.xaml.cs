@@ -93,7 +93,7 @@ namespace DSoft.VersionChanger.Views
         {
             mViewModel.IsBusy = true;
 
-            Task.Run(() =>
+			System.Threading.Tasks.Task.Run(() =>
             {
                 ThreadHelper.JoinableTaskFactory.Run(async delegate {
                     await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();

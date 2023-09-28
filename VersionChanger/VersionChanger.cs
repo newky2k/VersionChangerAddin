@@ -99,17 +99,6 @@ namespace DSoft.VersionChanger
             //    string message = string.Format(CultureInfo.CurrentCulture, "Inside {0}.MenuItemCallback()", this.GetType().FullName);
             //    string title = "VersionChanger";
 
-            //    // Show a message box to prove we were here
-            //VsShellUtilities.ShowMessageBox(
-            //    this.package,
-            //    message,
-            //    title,
-            //    OLEMSGICON.OLEMSGICON_INFO,
-            //    OLEMSGBUTTON.OLEMSGBUTTON_OK,
-            //    OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
-
-            //IVsUIShell uiShell = (IVsUIShell)GetService(typeof(SVsUIShell));
-
             try
             {
 

@@ -60,6 +60,7 @@
     <Compile Include="Converters\VersionToStringConverter.cs" />
     <Compile Include="Data\AndroidAppVersion.cs" />
     <Compile Include="Data\AppVersion.cs" />
+    <Compile Include="Data\AssemblyVersionOptions.cs" />
     <Compile Include="Data\CocoaAppVersion.cs" />
     <Compile Include="Data\Enum\FailureReason.cs" />
     <Compile Include="Data\FailedProject.cs" />
@@ -112,6 +113,7 @@
     <Content Include="Resources\Images.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="Resources\LoDaTek.png" />
     <Content Include="Resources\Package.ico">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>

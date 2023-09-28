@@ -45,6 +45,12 @@ namespace DSoft.VersionChanger.ViewModel
         private string _assemblyFileRevision;
         private string _assemblyFileMinor;
         private string _assemblyFileBuild;
+
+        private AssemblyVersionOptions _versionOptions = new AssemblyVersionOptions();
+
+        private int _totalProjects;
+        private int _currentProject;
+        private string _currentProjectName;
         #endregion
 
         public event EventHandler LoadingProgressUpdated = delegate { };
@@ -409,6 +415,106 @@ namespace DSoft.VersionChanger.ViewModel
                 }
             }
         }
+
+        #region Version Bools
+
+        public bool UpdateAssemblyVersion
+        {
+            get { return _versionOptions.UpdateAssemblyVersion; }
+            set
+            {
+                _versionOptions.UpdateAssemblyVersion = value;
+                SettingsControl.SetBooleanValue(value, "UpdateAssemblyVersion");
+                PropertyDidChange("UpdateAssemblyVersion");
+
+            }
+        }
+
+        public bool UpdateVersionPrefix
+        {
+            get { return _versionOptions.UpdateAssemblyVersionPrefix; }
+            set
+            {
+                _versionOptions.UpdateAssemblyVersionPrefix = value;
+                SettingsControl.SetBooleanValue(value, "UpdateVersionPrefix");
+                PropertyDidChange("UpdateVersionPrefix");
+
+            }
+        }
+
+        public bool UpdateFileVersion
+        {
+            get { return _versionOptions.UpdateFileVersion; }
+            set
+            {
+                _versionOptions.UpdateFileVersion = value;
+                SettingsControl.SetBooleanValue(value, "UpdateFileVersion");
+                PropertyDidChange("UpdateFileVersion");
+
+            }
+        }
+
+        public bool UpdatePackageVersion
+        {
+            get { return _versionOptions.UpdatePackageVersion; }
+            set
+            {
+                _versionOptions.UpdatePackageVersion = value;
+                SettingsControl.SetBooleanValue(value, "UpdatePackageVersion");
+                PropertyDidChange("UpdatePackageVersion");
+
+            }
+        }
+
+        public bool UpdateVersion
+        {
+            get { return _versionOptions.UpdateVersion; }
+            set
+            {
+                _versionOptions.UpdateVersion = value;
+                SettingsControl.SetBooleanValue(value, "UpdateVersion");
+                PropertyDidChange("UpdateVersion");
+
+            }
+        }
+
+        public bool UpdateInformationalVersion
+        {
+            get { return _versionOptions.UpdateInformationalVersion; }
+            set
+            {
+                _versionOptions.UpdateInformationalVersion = value;
+                SettingsControl.SetBooleanValue(value, "UpdateInformationalVersion");
+                PropertyDidChange("UpdateInformationalVersion");
+
+            }
+        }
+
+
+        #endregion
+
+        public string LoadingProjectsText
+        {
+            get { return $"Loading project {CurrentProject} of {TotalProjects}"; }
+        }
+
+        public int CurrentProject
+        {
+            get { return _currentProject; }
+            set { _currentProject = value; PropertyDidChange(nameof(CurrentProject)); PropertyDidChange(nameof(LoadingProjectsText)); }
+        }
+
+        public string CurrentProjectName
+        {
+            get { return _currentProjectName; }
+            set { _currentProjectName = value; PropertyDidChange(nameof(CurrentProjectName)); }
+        }
+
+        public int TotalProjects
+        {
+            get { return _totalProjects; }
+            set { _totalProjects = value; PropertyDidChange(nameof(TotalProjects)); PropertyDidChange(nameof(LoadingProjectsText)); }
+        }
         #endregion
 
         #region Constructor
@@ -427,40 +533,14 @@ namespace DSoft.VersionChanger.ViewModel
             forceSemVer = SettingsControl.GetBooleanValue("ForceSemVer");
             _updateNuget = SettingsControl.GetBooleanValue("UpdateNuget");
 
-            //LoadProjects();
+            _versionOptions.UpdateAssemblyVersion = SettingsControl.GetBooleanValue("UpdateAssemblyVersion", true);
+            _versionOptions.UpdateAssemblyVersionPrefix = SettingsControl.GetBooleanValue("UpdateVersionPrefix", true);
+            _versionOptions.UpdateFileVersion = SettingsControl.GetBooleanValue("UpdateFileVersion", true);
+            _versionOptions.UpdatePackageVersion = SettingsControl.GetBooleanValue("UpdatePackageVersion", true);
+            _versionOptions.UpdateVersion = SettingsControl.GetBooleanValue("UpdateVersion", true);
+            _versionOptions.UpdateInformationalVersion = SettingsControl.GetBooleanValue("UpdateInformationalVersion", true);
+
         }
-
-        private int _totalProjects;
-        private int _currentProject;
-        private string _currentProjectName;
-
-        public string LoadingProjectsText
-		{
-			get { return $"Loading project {CurrentProject} of {TotalProjects}"; }
-		}
-
-
-		public int CurrentProject
-		{
-			get { return _currentProject; }
-			set { _currentProject = value; PropertyDidChange(nameof(CurrentProject)); PropertyDidChange(nameof(LoadingProjectsText)); }
-		}
-
-
-
-		public string CurrentProjectName
-		{
-			get { return _currentProjectName; }
-			set { _currentProjectName = value; PropertyDidChange(nameof(CurrentProjectName)); }
-		}
-
-
-		public int TotalProjects
-		{
-			get { return _totalProjects; }
-			set { _totalProjects = value; PropertyDidChange(nameof(TotalProjects)); PropertyDidChange(nameof(LoadingProjectsText)); }
-		}
-
 
 		#endregion
 
@@ -573,12 +653,12 @@ namespace DSoft.VersionChanger.ViewModel
                         {
                             if (ver.IsNewStyleProject == true)
                             {
-                                solutionProcessor.UpdateProject(ver.RealProject, newVersion, fileVersion, forceSemVer ? preRelease : null);
+                                solutionProcessor.UpdateSdkProject(ver.RealProject,_versionOptions, newVersion, fileVersion, forceSemVer ? preRelease : null);
 
                             }
                             else
                             {
-                                solutionProcessor.UpdateFile(ver.ProjectItem, newVersion, fileVersion, forceSemVer ? preRelease : null);
+                                solutionProcessor.UpdateFrameworkProject(ver.ProjectItem, _versionOptions, newVersion, fileVersion, forceSemVer ? preRelease : null);
                             }
 
 

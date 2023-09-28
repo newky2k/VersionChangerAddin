@@ -172,7 +172,14 @@ namespace DSoft.VersionChanger.Data
             return versions;
         }
 
-        internal void UpdateProject(Project realProject, Version newVersion, Version fileVersion = null, string versionSuffix = null)
+        /// <summary>
+        /// Update an SDK style csproj
+        /// </summary>
+        /// <param name="realProject"></param>
+        /// <param name="newVersion"></param>
+        /// <param name="fileVersion"></param>
+        /// <param name="versionSuffix"></param>
+        internal void UpdateSdkProject(Project realProject, AssemblyVersionOptions versionOptions, Version newVersion, Version fileVersion = null, string versionSuffix = null)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
@@ -180,37 +187,41 @@ namespace DSoft.VersionChanger.Data
             {
                 var lowerCase = aProp.Name.ToLower();
 
-                if (lowerCase.Equals("assemblyversion"))
+                if (lowerCase.Equals("assemblyversion") && versionOptions.UpdateAssemblyVersion == true)
                 {
-                    aProp.Value = (newVersion.Revision == -1) ? newVersion.ToString(3) : newVersion.ToString();
+                    aProp.Value = versionOptions.GetVersionString(newVersion);
                 }
-                else if (lowerCase.Equals("fileversion"))
+                else if (lowerCase.Equals("versionprefix") && versionOptions.UpdateAssemblyVersionPrefix == true)
+                {
+                    aProp.Value = versionOptions.GetVersionString(newVersion);
+                }
+                else if (lowerCase.Equals("fileversion") && versionOptions.UpdateFileVersion == true)
                 {
                     var fVersion = (fileVersion == null) ? newVersion : fileVersion;
 
-                    aProp.Value = (fVersion.Revision == -1) ? fVersion.ToString(3) : fVersion.ToString();
+                    aProp.Value = versionOptions.GetVersionString(fVersion);
                 }
-                else if (lowerCase.Equals("version"))
+                else if (lowerCase.Equals("version") && versionOptions.UpdateVersion == true)
                 {
-                    var str = VersionHelper.CalculateVersion(newVersion, versionSuffix);
+                    var str = versionOptions.CalculateVersion(newVersion, versionSuffix);
 
                     aProp.Value = str;
 
                 }
-                else if (lowerCase.Equals("versionsuffix"))
+                else if (lowerCase.Equals("versionsuffix") && !string.IsNullOrWhiteSpace(versionSuffix))
                 {
                     aProp.Value = versionSuffix;
                 }
-                else if (lowerCase.Equals("packageversion", StringComparison.OrdinalIgnoreCase))
+                else if (lowerCase.Equals("packageversion", StringComparison.OrdinalIgnoreCase) && versionOptions.UpdatePackageVersion == true)
                 {
-                    var str = VersionHelper.CalculateVersion(newVersion, versionSuffix);
+                    var str = versionOptions.CalculateVersion(newVersion, versionSuffix);
 
                     aProp.Value = str;
 
                 }
-                else if (lowerCase.Equals("assemblyinformationalversion") || aProp.Name.ToLower().Equals("informationalversion"))
+                else if (lowerCase.Equals("assemblyinformationalversion") || aProp.Name.ToLower().Equals("informationalversion") && versionOptions.UpdateInformationalVersion == true)
                 {
-                    var str = VersionHelper.CalculateVersion(newVersion, versionSuffix);
+                    var str = versionOptions.CalculateVersion(newVersion, versionSuffix);
 
                     aProp.Value = str;
 
@@ -234,7 +245,7 @@ namespace DSoft.VersionChanger.Data
             {
                 foreach (var aLine in txt)
                 {
-                    if (aLine.Contains($"<{seachText}>"))
+                    if (aLine.Contains($"<{seachText}>") && versionOptions.UpdateInformationalVersion == true)
                     {
                         var newLine = aLine;
 
@@ -252,7 +263,7 @@ namespace DSoft.VersionChanger.Data
                             outPutLines.Add(newLine);
                         }
                     }
-                    else if (aLine.Contains($"<{seachText2}>"))
+                    else if (aLine.Contains($"<{seachText2}>") && versionOptions.UpdatePackageVersion == true)
                     {
                         var newLine = aLine;
 
@@ -282,12 +293,12 @@ namespace DSoft.VersionChanger.Data
         }
 
         /// <summary>
-        /// Updates the file.
+        /// Update an old framework style csproj
         /// </summary>
         /// <param name="item">The item.</param>
         /// <param name="newAssemblyVersion">The new assembly version.</param>
         /// <param name="newFileVersion">The new file version.</param>
-        public void UpdateFile(ProjectItem item, Version newAssemblyVersion, Version newFileVersion = null, string versionSuffix = null)
+        public void UpdateFrameworkProject(ProjectItem item, AssemblyVersionOptions versionOptions, Version newAssemblyVersion, Version newFileVersion = null, string versionSuffix = null)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 

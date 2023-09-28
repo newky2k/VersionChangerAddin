@@ -47,20 +47,6 @@ namespace DSoft.VersionChanger.Views
 		{
             Dispatcher.Invoke(DispatcherPriority.Background, new Action(delegate { this.UpdateLayout(); }));
 
-   //         Dispatcher.Invoke((Action)(() =>
-			//{
-   //             txtProjectsLoading.Text = mViewModel.LoadingProjectsText;
-   //         }));
-
-			//ThreadHelper.JoinableTaskFactory.Run(async delegate {
-   //             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
-
-   //             await Task.Delay(1000);
-
-               
-                
-   //         });
-
         }
 
         private void OnBeginClicked(object sender, RoutedEventArgs e)
@@ -75,7 +61,7 @@ namespace DSoft.VersionChanger.Views
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, "DSoft - Version Changer");
+                MessageBox.Show(ex.Message, "Version Changer");
             }
         }
 

@@ -28,7 +28,7 @@ namespace DSoft.VersionChanger.Data
 				{
 					if (fileVersion != null)
 					{
-						if (item.AssemblyVersion <= fileVersion)
+						if (item.FileVersion <= fileVersion)
 						{
 							continue;
 						}
@@ -53,15 +53,15 @@ namespace DSoft.VersionChanger.Data
 				{
 					if (version != null)
 					{
-						if (item.AssemblyVersion <= version)
+						if (item.ActiveVersion <= version)
 						{
 							continue;
 						}
-						version = item.AssemblyVersion;
+						version = item.ActiveVersion;
 					}
 					else
 					{
-						version = item.AssemblyVersion;
+						version = item.ActiveVersion;
 					}
 				}
 				return version;

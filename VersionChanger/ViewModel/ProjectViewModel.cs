@@ -18,18 +18,18 @@ namespace DSoft.VersionChanger.ViewModel
     {
         #region Fields
         private ProjectVersionCollection mItems;
-        private String mVersion;
-        private String mFileVersion;
-        private Solution mCurrentSolution;
-        private bool mSeparateVersions = false;
+        private string _version;
+        private string _fileVersion;
+        private Solution _currentSolution;
+        private bool _separateVersions = false;
         private bool isOs;
         private bool showAndroid;
         private string cocoaShortVersion;
-        private DTE mApplication;
+        private DTE _application;
         private string androidBuild;
         private bool selectAll = true;
-        private bool mUpdateClickOnce;
-        private bool forceSemVer;
+        private bool _updateClickOnce;
+        private bool _forceSemVer;
         private string preRelease;
         private bool _updateNuget;
         private bool _showUnloadedWarning;
@@ -161,23 +161,23 @@ namespace DSoft.VersionChanger.ViewModel
         {
             get
             {
-                if (mVersion == null)
+                if (_version == null)
                 {
                     var highVersion = Items.HighestVersion;
 
 
-                    mVersion = (highVersion != null) ? highVersion.ToString() : "1.0.0.0";
+                    _version = (highVersion != null) ? highVersion.ToString() : "1.0.0.0";
                 }
 
-                return mVersion;
+                return _version;
             }
             set
             {
-                mVersion = value;
+                _version = value;
 
                 Version outVersion = null;
 
-                if (System.Version.TryParse(mVersion, out outVersion))
+                if (System.Version.TryParse(_version, out outVersion))
                 {
                     if (ShowIos)
                     {
@@ -208,7 +208,7 @@ namespace DSoft.VersionChanger.ViewModel
                         string msg = null;
 
                         Version outVersion;
-                        if (!System.Version.TryParse(mVersion, out outVersion))
+                        if (!System.Version.TryParse(_version, out outVersion))
                         {
                             msg = "Invalid version number";
                         }
@@ -224,22 +224,22 @@ namespace DSoft.VersionChanger.ViewModel
         {
             get
             {
-                if (!mSeparateVersions)
+                if (!_separateVersions)
                     return String.Empty;
 
-                if (mFileVersion == null)
+                if (_fileVersion == null)
                 {
                     var highVersion = Items.HighestFileVersion;
 
 
-                    mFileVersion = (highVersion != null) ? highVersion.ToString() : "1.0.0.0";
+                    _fileVersion = (highVersion != null) ? highVersion.ToString() : "1.0.0.0";
                 }
 
-                return mFileVersion;
+                return _fileVersion;
             }
             set
             {
-                mFileVersion = value;
+                _fileVersion = value;
 
                 PropertyDidChange("FileVersion");
             }
@@ -247,10 +247,10 @@ namespace DSoft.VersionChanger.ViewModel
 
         public bool UpdateClickOnce
         {
-            get { return mUpdateClickOnce; }
+            get { return _updateClickOnce; }
             set
             {
-                mUpdateClickOnce = value;
+                _updateClickOnce = value;
                 SettingsControl.SetBooleanValue(value, "UpdateClickOnce");
                 PropertyDidChange("UpdateClickOnce");
 
@@ -261,13 +261,13 @@ namespace DSoft.VersionChanger.ViewModel
         {
             get
             {
-                return mSeparateVersions;
+                return _separateVersions;
             }
             set
             {
-                if (mSeparateVersions != value)
+                if (_separateVersions != value)
                 {
-                    mSeparateVersions = value;
+                    _separateVersions = value;
                     SettingsControl.SetBooleanValue(value, "SeparateVersions");
                     PropertyDidChange("SeparateVersions");
                     LoadAssFileVersion();
@@ -277,20 +277,25 @@ namespace DSoft.VersionChanger.ViewModel
 
         public bool ForceSemVer
         {
-            get { return forceSemVer; }
+            get { return _forceSemVer; }
             set
             {
-                forceSemVer = value;
+                _forceSemVer = value;
                 SettingsControl.SetBooleanValue(value, "ForceSemVer");
+
+                if (_forceSemVer == true)
+                    EnableRevision = false;
+
                 PropertyDidChange("ForceSemVer");
                 PropertyDidChange("ShowRevision");
                 PropertyDidChange("ShowSemVer");
+                PropertyDidChange("EnableRevisionEnabled");
             }
         }
 
         public bool ShowSemVer
         {
-            get { return forceSemVer; }
+            get { return _forceSemVer; }
         }
 
         public bool ShowIos
@@ -401,7 +406,7 @@ namespace DSoft.VersionChanger.ViewModel
 
         public bool ShowRevision
         {
-            get { return !forceSemVer; }
+            get { return !_forceSemVer; }
         }
 
         public string Filter
@@ -490,6 +495,21 @@ namespace DSoft.VersionChanger.ViewModel
             }
         }
 
+        public bool EnableRevision
+        {
+            get { return _versionOptions.EnableRevision; }
+            set
+            {
+                _versionOptions.EnableRevision = value;
+                SettingsControl.SetBooleanValue(value, "EnableRevision");
+                PropertyDidChange("EnableRevision");
+            }
+        }
+
+        /// <summary>
+        /// Enable revision as long as ForceSemVer is not ticked
+        /// </summary>
+        public bool EnableRevisionEnabled => !ForceSemVer;
 
         #endregion
 
@@ -523,15 +543,21 @@ namespace DSoft.VersionChanger.ViewModel
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
-            mApplication = application;
-            mCurrentSolution = application.Solution;
+            _application = application;
+            _currentSolution = application.Solution;
 
             this.Items = new ProjectVersionCollection();
 
-            mSeparateVersions = SettingsControl.GetBooleanValue("SeparateVersions");
-            mUpdateClickOnce = SettingsControl.GetBooleanValue("UpdateClickOnce");
-            forceSemVer = SettingsControl.GetBooleanValue("ForceSemVer");
+            _separateVersions = SettingsControl.GetBooleanValue("SeparateVersions");
+            _updateClickOnce = SettingsControl.GetBooleanValue("UpdateClickOnce");
+            _forceSemVer = SettingsControl.GetBooleanValue("ForceSemVer");
             _updateNuget = SettingsControl.GetBooleanValue("UpdateNuget");
+            _versionOptions.EnableRevision = SettingsControl.GetBooleanValue("EnableRevision", true);
+
+            if (_forceSemVer == true)
+            {
+                _versionOptions.EnableRevision = false;
+            }
 
             _versionOptions.UpdateAssemblyVersion = SettingsControl.GetBooleanValue("UpdateAssemblyVersion", true);
             _versionOptions.UpdateAssemblyVersionPrefix = SettingsControl.GetBooleanValue("UpdateVersionPrefix", true);
@@ -553,7 +579,7 @@ namespace DSoft.VersionChanger.ViewModel
 
                 
 
-                using (var solutionProcessor = new SolutionProcessor(mCurrentSolution))
+                using (var solutionProcessor = new SolutionProcessor(_currentSolution))
                 {
 
                     solutionProcessor.OnLoadedProjects += (s, e) =>
@@ -571,7 +597,7 @@ namespace DSoft.VersionChanger.ViewModel
                         LoadingProgressUpdated(this, null);
                     };
 
-                    var projVers = solutionProcessor.BuildVersions(mCurrentSolution);
+                    var projVers = solutionProcessor.BuildVersions(_currentSolution);
                     ShowUnloadedWarning = solutionProcessor.DetectedUnloadedProjects;
                     FailedProjects = solutionProcessor.FailedProjects;
 
@@ -615,6 +641,7 @@ namespace DSoft.VersionChanger.ViewModel
 			}
 
         }
+
         public void ProcessUpdates()
         {
             try
@@ -625,27 +652,27 @@ namespace DSoft.VersionChanger.ViewModel
                 Version fileVersion = null;
 
                 //add support for dynamic build revision values
-                var theVersion = (forceSemVer) ? $"{AssemblyMajor ?? "0"}.{AssemblyMinor ?? "0"}.{AssemblyBuild ?? "0"}" : this.AssemblyVersion;
+                var theVersion = (_forceSemVer) ? $"{AssemblyMajor ?? "0"}.{AssemblyMinor ?? "0"}.{AssemblyBuild ?? "0"}" : this.AssemblyVersion;
 
                 newVersion = new Version(theVersion);
 
                 var newVersionValue = (newVersion.Revision == -1) ? $"{newVersion.Major}.{newVersion.Minor}.{newVersion.Build}.0" : newVersion.ToString();
 
-                if (mSeparateVersions)
+                if (_separateVersions)
                 {
-                    var vers = (forceSemVer) ? $"{AssemblyFileMajor ?? "0"}.{AssemblyFileMinor ?? "0"}.{AssemblyFileBuild ?? "0"}" : this.FileVersion;
+                    var vers = (_forceSemVer) ? $"{AssemblyFileMajor ?? "0"}.{AssemblyFileMinor ?? "0"}.{AssemblyFileBuild ?? "0"}" : this.FileVersion;
 
                     fileVersion = new Version(vers);
                 }
 
 
-                var _serviceProvider = new ServiceProvider(mApplication as Microsoft.VisualStudio.OLE.Interop.IServiceProvider);
+                var _serviceProvider = new ServiceProvider(_application as Microsoft.VisualStudio.OLE.Interop.IServiceProvider);
                 var _sln = (IVsSolution)_serviceProvider.GetService(typeof(SVsSolution));
 
                 if (_sln == null)
                     throw new Exception("Unable to find the solution");
 
-                using (var solutionProcessor = new SolutionProcessor(mCurrentSolution))
+                using (var solutionProcessor = new SolutionProcessor(_currentSolution))
                 {
                     foreach (ProjectVersion ver in Items)
                     {
@@ -653,12 +680,12 @@ namespace DSoft.VersionChanger.ViewModel
                         {
                             if (ver.IsNewStyleProject == true)
                             {
-                                solutionProcessor.UpdateSdkProject(ver.RealProject,_versionOptions, newVersion, fileVersion, forceSemVer ? preRelease : null);
+                                solutionProcessor.UpdateSdkProject(ver.RealProject,_versionOptions, newVersion, fileVersion, _forceSemVer ? preRelease : null);
 
                             }
                             else
                             {
-                                solutionProcessor.UpdateFrameworkProject(ver.ProjectItem, _versionOptions, newVersion, fileVersion, forceSemVer ? preRelease : null);
+                                solutionProcessor.UpdateFrameworkProject(ver.ProjectItem, _versionOptions, newVersion, fileVersion, _forceSemVer ? preRelease : null);
                             }
 
 
@@ -700,7 +727,7 @@ namespace DSoft.VersionChanger.ViewModel
 
                                     if (hasChanged)
                                     {
-                                        var stP = mApplication.Solution.Properties.Item("StartupProject").Value;
+                                        var stP = _application.Solution.Properties.Item("StartupProject").Value;
 
                                         var stPName = ver.RealProject.Name;
 
@@ -729,7 +756,7 @@ namespace DSoft.VersionChanger.ViewModel
 
                                         if (stP.Equals(stPName))
                                         {
-                                            mApplication.Solution.Properties.Item("StartupProject").Value = stPName;
+                                            _application.Solution.Properties.Item("StartupProject").Value = stPName;
 
                                         }
 
@@ -801,18 +828,22 @@ namespace DSoft.VersionChanger.ViewModel
 
 
         }
+
         public void FilterProjects()
         {
             PropertyDidChange("Items");
         }
+
         private void RecalculateVersion()
         {
             AssemblyVersion = $"{AssemblyMajor}.{AssemblyMinor}.{AssemblyBuild}.{AssesmblyRevision}";
         }
+
         private void RecalculateFileVersion()
         {
             FileVersion = $"{AssemblyFileMajor ?? "0"}.{AssemblyFileMinor ?? "0"}.{AssemblyFileBuild ?? "0"}.{AssesmblyFileRevision ?? "0"}";
         }
+
         private void LoadAssVersion()
         {
             var assmVersion = new Version(AssemblyVersion);
@@ -822,9 +853,10 @@ namespace DSoft.VersionChanger.ViewModel
             AssemblyBuild = assmVersion.Build.ToString();
             AssesmblyRevision = assmVersion.Revision.ToString();
         }
+
         private void LoadAssFileVersion()
         {
-            if (mSeparateVersions == true)
+            if (_separateVersions == true)
             {
                 var assmVersion = new Version(FileVersion);
 
@@ -846,6 +878,7 @@ namespace DSoft.VersionChanger.ViewModel
                 PropertyDidChange(nameof(AssesmblyFileRevision));
             }
         }
+
         private bool ProjectFilter(object item)
         {
             ProjectVersion proj = item as ProjectVersion;

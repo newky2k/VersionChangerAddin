@@ -6,6 +6,7 @@
     <FileVersion>1.0.3.1</FileVersion>
     <InformationalVersion>1.0.3.1</InformationalVersion>
     <Version>1.0.3.1</Version>
+	<VersionPrefix>1.4.3.1</VersionPrefix>
   </PropertyGroup>
 
 </Project>

@@ -1,4 +1,5 @@
-﻿using DSoft.VersionChanger.Helpers;
+﻿using DSoft.VersionChanger.Extensions;
+using DSoft.VersionChanger.Helpers;
 using EnvDTE;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Flavor;
@@ -342,7 +343,7 @@ namespace DSoft.VersionChanger.Data
 
                     if (aLine.ToLower().Contains(assemblyText))
                     {
-                        if (aLine.Contains(searchText))
+                        if (aLine.Contains(searchText) && versionOptions.UpdateAssemblyVersion == true)
                         {
                             //now get the version number
                             int locationStart = aLine.IndexOf(searchText);
@@ -367,7 +368,7 @@ namespace DSoft.VersionChanger.Data
 
                         }
 
-                        if (aLine.Contains(searchText2))
+                        if (aLine.Contains(searchText2) && versionOptions.UpdateFileVersion == true)
                         {
                             int locationStart = aLine.IndexOf(searchText2);
                             var searchLength = searchText2.Length;
@@ -392,7 +393,7 @@ namespace DSoft.VersionChanger.Data
 
                         }
 
-                        if (aLine.Contains(searchText3))
+                        if (aLine.Contains(searchText3) && versionOptions.UpdateInformationalVersion == true)
                         {
                             int locationStart = aLine.IndexOf(searchText3);
                             var searchLength = searchText3.Length;
@@ -867,26 +868,39 @@ namespace DSoft.VersionChanger.Data
         /// <returns></returns>
         private ProjectVersion ProcessNewStyleProject(Project project)
         {
-            var version = string.Empty;
+            var assemblyVersion = string.Empty;
             var fileVersion = string.Empty;
             var packageVersion = string.Empty;
             var versionSuffix = string.Empty;
+            var version = string.Empty;
+            var versionPrefix = string.Empty;
+            var informationVersion = string.Empty;
 
             ThreadHelper.ThrowIfNotOnUIThread();
 
             foreach (Property aProp in project.Properties)
             {
+                Debug.WriteLine(aProp.Name);
+
                 if (aProp.Name.ToLower().Equals("assemblyversion"))
                 {
-                    version = aProp.Value as String;
+                    assemblyVersion = aProp.Value as string;
                 }
                 else if (aProp.Name.ToLower().Equals("fileversion"))
                 {
-                    fileVersion = aProp.Value as String;
+                    fileVersion = aProp.Value as string;
                 }
                 else if (aProp.Name.ToLower().Equals("version"))
                 {
-                    packageVersion = aProp.Value as String;
+                    version = aProp.Value as string;
+                }
+                else if (aProp.Name.ToLower().Equals("versionprefix"))
+                {
+                    versionPrefix = aProp.Value as string;
+                }
+                else if (aProp.Name.ToLower().Equals("packageversion"))
+                {
+                    packageVersion = aProp.Value as string;
                     if (packageVersion.Contains("-") && string.IsNullOrEmpty(versionSuffix))
                     {
                         var start = packageVersion.IndexOf("-");
@@ -896,48 +910,112 @@ namespace DSoft.VersionChanger.Data
                 }
                 else if (aProp.Name.ToLower().Equals("versionsuffix"))
                 {
-                    versionSuffix = aProp.Value as String;
+                    versionSuffix = aProp.Value as string;
                 }
             }
 
-            //is this using the new style csproj
 
-            if (version != String.Empty)
+            //Update some properties via the xml, such as InformationalVersion
+            var txt = File.ReadAllLines(project.FileName);
+            var searchableText = string.Join("", txt);
+
+            var seachText = "InformationalVersion";
+            var seachText2 = "VersionPrefix";
+
+            var outPutLines = new List<string>();
+
+            //update informational version and package version
+            if (searchableText.Contains(seachText) || searchableText.Contains(seachText2))
             {
-                //MessageBox.Show(String.Format("{0} \n {1}", proj.Name, version));
-                var newVersion = new ProjectVersion();
-                newVersion.Name = project.Name;
-                newVersion.Path = project.FileName;
-                newVersion.RealProject = project;
-                newVersion.IsNewStyleProject = true;
-                newVersion.ProjectType = "SDK";
-                newVersion.VersionSuffix = versionSuffix;
+                foreach (var aLine in txt)
+                {
+                    if (aLine.Contains($"<{seachText}>"))
+                    {
+                        informationVersion = aLine.ValueForNode(seachText);
+                    }
+                    else if (aLine.Contains($"<{seachText2}>"))
+                    {
+                        versionPrefix = aLine.ValueForNode(seachText2);
+                    }
+
+                }
+            }
+
+
+
+
+            //is this using the new style csproj
+            var newVersion = new ProjectVersion();
+            newVersion.Name = project.Name;
+            newVersion.Path = project.FileName;
+            newVersion.RealProject = project;
+            newVersion.IsNewStyleProject = true;
+            newVersion.ProjectType = "SDK";
+            newVersion.VersionSuffix = versionSuffix;
+            newVersion.InformationalVersion = informationVersion;
+
+            if (assemblyVersion != string.Empty)
+            {               
                 try
                 {
-                    newVersion.AssemblyVersion = new Version(version);
+                    newVersion.AssemblyVersion = new Version(assemblyVersion);
                 }
                 catch
                 {
-                    newVersion.AssemblyVersion = new Version("1.0");
+                   
                 }
-
-                if (fileVersion != String.Empty)
-                {
-                    try
-                    {
-                        newVersion.FileVersion = new Version(fileVersion);
-                    }
-                    catch
-                    {
-                        newVersion.FileVersion = newVersion.AssemblyVersion;
-                    }
-                }
-
-                return newVersion;
 
             }
 
-            return null;
+            if (fileVersion != string.Empty)
+            {
+                try
+                {
+                    newVersion.FileVersion = new Version(fileVersion);
+                }
+                catch
+                {
+                    newVersion.FileVersion = newVersion.AssemblyVersion;
+                }
+            }
+
+            if (version != string.Empty)
+            {
+                try
+                {
+                    newVersion.Version = new Version(version);
+                }
+                catch
+                {
+                    
+                }
+            }
+
+            if (packageVersion != string.Empty)
+            {
+                try
+                {
+                    newVersion.PackageVersion = new Version(packageVersion);
+                }
+                catch
+                {
+
+                }
+            }
+
+            if (versionPrefix != string.Empty)
+            {
+                try
+                {
+                    newVersion.VersionPrefix = new Version(versionPrefix);
+                }
+                catch
+                {
+
+                }
+            }
+
+            return newVersion;
         }
 
         public void Dispose()

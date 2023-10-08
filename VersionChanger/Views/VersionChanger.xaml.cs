@@ -24,20 +24,17 @@ namespace DSoft.VersionChanger.Views
     /// </summary>
     public partial class VersionChanger : DialogWindow
     {
-        private ProjectViewModel mViewModel;
-
-        private const float heightShort = 500;
-        private const float heightTall = 500;
+        private ProjectViewModel _viewModel;
 
         public VersionChanger(DTE applicationObject)
         {
             InitializeComponent();
 
-            mViewModel = new ProjectViewModel(applicationObject);
+            _viewModel = new ProjectViewModel(applicationObject);
 
-            this.DataContext = mViewModel;
+            this.DataContext = _viewModel;
 
-			mViewModel.LoadingProgressUpdated += MViewModel_LoadingProgressUpdated;
+			_viewModel.LoadingProgressUpdated += MViewModel_LoadingProgressUpdated;
 
             OnUseSemVerChecked(this, null);
             OnUseSeperateVersionsChanged(this, null);
@@ -55,7 +52,7 @@ namespace DSoft.VersionChanger.Views
 
             try
             {
-                mViewModel.ProcessUpdates();
+                _viewModel.ProcessUpdates();
 
                 this.DialogResult = true;
             }
@@ -65,31 +62,31 @@ namespace DSoft.VersionChanger.Views
             }
         }
 
-        private void edtVersion_PreviewKeyDown(object sender, KeyEventArgs e)
+        private void OnPreviewKeyDown(object sender, KeyEventArgs e)
         {
 
         }
 
         private void OnToggleAllClicked(object sender, RoutedEventArgs e)
         {
-            mViewModel.SelectAll = !mViewModel.SelectAll;
+            _viewModel.SelectAll = !_viewModel.SelectAll;
         }
 
         private void OnLoaded(object sender, RoutedEventArgs e)
         {
-            mViewModel.IsBusy = true;
+            _viewModel.IsBusy = true;
 
             Task.Run(() =>
             {
                 ThreadHelper.JoinableTaskFactory.Run(async delegate {
                     await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
-                    if (mViewModel.IsLoaded == false)
+                    if (_viewModel.IsLoaded == false)
                     {
-                        mViewModel.LoadProjects();
+                        _viewModel.LoadProjects();
                     }
 
-                    if (mViewModel.Items.Count == 0 && mViewModel.Errors.Count == 0)
+                    if (_viewModel.Items.Count == 0 && _viewModel.Errors.Count == 0)
                     {
                         MessageBox.Show("There were no compatible projects found in the solution");
 
@@ -104,12 +101,12 @@ namespace DSoft.VersionChanger.Views
 
         private void FilterClick(object sender, RoutedEventArgs e)
         {
-            mViewModel.FilterProjects();
+            _viewModel.FilterProjects();
         }
 
         private void OnUseSemVerChecked(object sender, RoutedEventArgs e)
         {
-            hdrVersionSuffix.Visibility = mViewModel.ShowSemVer ? Visibility.Visible : Visibility.Hidden;
+            hdrVersionSuffix.Visibility = _viewModel.ShowSemVer ? Visibility.Visible : Visibility.Hidden;
         }
 
 		private void OnClickLogo(object sender, RoutedEventArgs e)
@@ -121,7 +118,7 @@ namespace DSoft.VersionChanger.Views
 
 		private void OnUseSeperateVersionsChanged(object sender, RoutedEventArgs e)
 		{
-            hdrFileVersion.Visibility = mViewModel.SeparateVersions ? Visibility.Visible : Visibility.Hidden;
+            hdrFileVersion.Visibility = _viewModel.SeparateVersions ? Visibility.Visible : Visibility.Hidden;
 
         }
 	}

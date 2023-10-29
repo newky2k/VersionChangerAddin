@@ -24,6 +24,8 @@ namespace DSoft.VersionChanger.Data
         private Version _packageVersion;
         private Version _version;
         private Version _versionPrefix;
+        private Version _mauiDisplayVersion;
+        private Version _mauiAppVersion;
 
         private string _versionSuffix;
         private string _informationalVersion;
@@ -65,7 +67,37 @@ namespace DSoft.VersionChanger.Data
         /// <summary>
         /// Display the version information for the active version
         /// </summary>
-        public string ActiveVersionValue => (ActiveVersion.Revision <= 0) ? $"{ActiveVersion.Major}.{ActiveVersion.Minor}.{ActiveVersion.Build}" : ActiveVersion.ToString();
+        public string ActiveVersionValue2 => (ActiveVersion.Revision <= 0) ? $"{ActiveVersion.Major}.{ActiveVersion.Minor}.{ActiveVersion.Build}" : ActiveVersion.ToString();
+
+        public string ActiveVersionValue
+        {
+            get
+            {
+                var strVersion = "1.0";
+
+                if (ActiveVersion.Major >= 0)
+                {
+                    strVersion = $"{ActiveVersion.Major}";
+                }
+
+                if (ActiveVersion.Minor >= 0)
+                {
+                    strVersion = $"{strVersion}.{ActiveVersion.Minor}";
+                }
+
+                if (ActiveVersion.Build >= 0)
+                {
+                    strVersion = $"{strVersion}.{ActiveVersion.Build}";
+                }
+
+                if (ActiveVersion.Revision >= 0)
+                {
+                    strVersion = $"{strVersion}.{ActiveVersion.Revision}";
+                }
+
+                return strVersion;
+            }
+        }
 
         public bool IsNewStyleProject
         {
@@ -200,6 +232,36 @@ namespace DSoft.VersionChanger.Data
                 _versionPrefix = value;
 
                 PropertyDidChange(nameof(VersionPrefix));
+            }
+        }
+
+        public Version MauiDisplayVersion
+        {
+            get
+            {
+                return _mauiDisplayVersion;
+            }
+
+            set
+            {
+                _mauiDisplayVersion = value;
+
+                PropertyDidChange(nameof(MauiDisplayVersion));
+            }
+        }
+
+        public Version MauiAppVersion
+        {
+            get
+            {
+                return _mauiAppVersion;
+            }
+
+            set
+            {
+                _mauiAppVersion = value;
+
+                PropertyDidChange(nameof(MauiAppVersion));
             }
         }
 

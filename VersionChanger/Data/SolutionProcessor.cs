@@ -875,6 +875,8 @@ namespace DSoft.VersionChanger.Data
             var version = string.Empty;
             var versionPrefix = string.Empty;
             var informationVersion = string.Empty;
+            var mauiAppDisplayVersion = string.Empty;
+            var mauiAppVersion = string.Empty;
 
             ThreadHelper.ThrowIfNotOnUIThread();
 
@@ -919,30 +921,35 @@ namespace DSoft.VersionChanger.Data
             var txt = File.ReadAllLines(project.FileName);
             var searchableText = string.Join("", txt);
 
-            var seachText = "InformationalVersion";
-            var seachText2 = "VersionPrefix";
-
-            var outPutLines = new List<string>();
+            var infoVersion = "InformationalVersion";
+            var verPrefix = "VersionPrefix";
+            var mauiDisplayVersion = "ApplicationDisplayVersion";
+            var mauiAppVersionStr = "ApplicationVersion";
 
             //update informational version and package version
-            if (searchableText.Contains(seachText) || searchableText.Contains(seachText2))
+            if (searchableText.Contains(infoVersion) || searchableText.Contains(verPrefix) || searchableText.Contains(mauiDisplayVersion) || searchableText.Contains(mauiAppVersionStr))
             {
                 foreach (var aLine in txt)
                 {
-                    if (aLine.Contains($"<{seachText}>"))
+                    if (aLine.Contains($"<{infoVersion}>"))
                     {
-                        informationVersion = aLine.ValueForNode(seachText);
+                        informationVersion = aLine.ValueForNode(infoVersion);
                     }
-                    else if (aLine.Contains($"<{seachText2}>"))
+                    else if (aLine.Contains($"<{verPrefix}>"))
                     {
-                        versionPrefix = aLine.ValueForNode(seachText2);
+                        versionPrefix = aLine.ValueForNode(verPrefix);
+                    }
+                    else if (aLine.Contains($"<{mauiDisplayVersion}>"))
+                    {
+                        mauiAppDisplayVersion = aLine.ValueForNode(mauiDisplayVersion);
+                    }
+                    else if (aLine.Contains($"<{mauiAppVersionStr}>"))
+                    {
+                        mauiAppVersion = aLine.ValueForNode(mauiAppVersionStr);
                     }
 
                 }
             }
-
-
-
 
             //is this using the new style csproj
             var newVersion = new ProjectVersion();
@@ -1008,6 +1015,30 @@ namespace DSoft.VersionChanger.Data
                 try
                 {
                     newVersion.VersionPrefix = new Version(versionPrefix);
+                }
+                catch
+                {
+
+                }
+            }
+
+            if (mauiAppDisplayVersion != string.Empty)
+            {
+                try
+                {
+                    newVersion.MauiDisplayVersion = new Version(mauiAppDisplayVersion);
+                }
+                catch
+                {
+
+                }
+            }
+
+            if (mauiAppVersion != string.Empty)
+            {
+                try
+                {
+                    newVersion.MauiAppVersion = new Version(mauiAppVersion);
                 }
                 catch
                 {

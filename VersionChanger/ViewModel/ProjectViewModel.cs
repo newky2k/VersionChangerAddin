@@ -166,7 +166,7 @@ namespace DSoft.VersionChanger.ViewModel
                     var highVersion = Items.HighestVersion;
 
 
-                    _version = (highVersion != null) ? highVersion.ToString() : "1.0.0.0";
+                    _version = (highVersion != null) ? highVersion.AsCleanString() : "1.0.0.0";
                 }
 
                 return _version;
@@ -847,7 +847,7 @@ namespace DSoft.VersionChanger.ViewModel
         private void LoadAssVersion()
         {
             var assmVersion = new Version(AssemblyVersion);
-
+         
             AssemblyMajor = assmVersion.Major.ToString();
             AssemblyMinor = assmVersion.Minor.ToString();
             AssemblyBuild = assmVersion.Build.ToString();

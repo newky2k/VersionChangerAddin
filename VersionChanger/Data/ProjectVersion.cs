@@ -67,8 +67,6 @@ namespace DSoft.VersionChanger.Data
         /// <summary>
         /// Display the version information for the active version
         /// </summary>
-        public string ActiveVersionValue2 => (ActiveVersion.Revision <= 0) ? $"{ActiveVersion.Major}.{ActiveVersion.Minor}.{ActiveVersion.Build}" : ActiveVersion.ToString();
-
         public string ActiveVersionValue
         {
             get

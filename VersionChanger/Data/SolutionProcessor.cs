@@ -435,14 +435,6 @@ namespace DSoft.VersionChanger.Data
 
             }
 
-            //if (updatedVersionSuffix == false && string.IsNullOrEmpty(versionSuffix) == false)
-            //{
-            //    var newFileVersionValue = (newFileVersion.Revision == -1) ? $"{newFileVersion.Major}.{newFileVersion.Minor}.{newFileVersion.Build}.0" : newFileVersion.ToString();
-            //    newFileVersionValue += $"-{versionSuffix}";
-            //    var newLine = String.Format("[assembly: AssemblyInformationalVersion(\"{0}\")]\r\n", newFileVersionValue);
-            //    objEditPt.Insert(newLine);
-            //}
-
             item.Save();
             aDoc.Close();
             

@@ -236,48 +236,105 @@ namespace DSoft.VersionChanger.Data
             var txt = File.ReadAllLines(realProject.FileName);
             var searchableText = string.Join("", txt);
 
-            var seachText = "InformationalVersion";
-            var seachText2 = "PackageVersion";
+            var infoVersion = "InformationalVersion";
+            var packVer = "PackageVersion";
+            var mauiDisplayVersion = "ApplicationDisplayVersion";
+            var mauiAppVersionStr = "ApplicationVersion";
+            var verPrefix = "VersionPrefix";
 
             var outPutLines = new List<string>();
 
             //update informational version and package version
-            if (searchableText.Contains(seachText) || searchableText.Contains(seachText2))
+            if (searchableText.Contains(infoVersion) || searchableText.Contains(packVer) || searchableText.Contains(mauiDisplayVersion) || searchableText.Contains(mauiAppVersionStr) || searchableText.Contains(verPrefix))
             {
                 foreach (var aLine in txt)
                 {
-                    if (aLine.Contains($"<{seachText}>") && versionOptions.UpdateInformationalVersion == true)
+                    if (aLine.Contains($"<{infoVersion}>") && versionOptions.UpdateInformationalVersion == true)
                     {
                         var newLine = aLine;
 
-                        var pos = newLine.IndexOf($"<{seachText}>");
-                        var closer = newLine.IndexOf($"</{seachText}>");
+                        var pos = newLine.IndexOf($"<{infoVersion}>");
+                        var closer = newLine.IndexOf($"</{infoVersion}>");
 
                         if (pos != -1 && closer != -1)
                         {
-                            newLine = newLine.Substring(0, pos + (seachText.Length + 2));
+                            newLine = newLine.Substring(0, pos + (infoVersion.Length + 2));
 
                             newLine += VersionHelper.CalculateVersion(newVersion, versionSuffix);
 
-                            newLine += $"</{seachText}>";
+                            newLine += $"</{infoVersion}>";
 
                             outPutLines.Add(newLine);
                         }
                     }
-                    else if (aLine.Contains($"<{seachText2}>") && versionOptions.UpdatePackageVersion == true)
+                    else if (aLine.Contains($"<{packVer}>") && versionOptions.UpdatePackageVersion == true)
                     {
                         var newLine = aLine;
 
-                        var pos = newLine.IndexOf($"<{seachText2}>");
-                        var closer = newLine.IndexOf($"</{seachText2}>");
+                        var pos = newLine.IndexOf($"<{packVer}>");
+                        var closer = newLine.IndexOf($"</{packVer}>");
 
                         if (pos != -1 && closer != -1)
                         {
-                            newLine = newLine.Substring(0, pos + (seachText2.Length + 2));
+                            newLine = newLine.Substring(0, pos + (packVer.Length + 2));
 
                             newLine += VersionHelper.CalculateVersion(newVersion, versionSuffix);
 
-                            newLine += $"</{seachText2}>";
+                            newLine += $"</{packVer}>";
+
+                            outPutLines.Add(newLine);
+                        }
+                    }
+                    else if (aLine.Contains($"<{mauiDisplayVersion}>") && versionOptions.UpdateAppDisplayVersion == true)
+                    {
+                        var newLine = aLine;
+
+                        var pos = newLine.IndexOf($"<{mauiDisplayVersion}>");
+                        var closer = newLine.IndexOf($"</{mauiDisplayVersion}>");
+
+                        if (pos != -1 && closer != -1)
+                        {
+                            newLine = newLine.Substring(0, pos + (mauiDisplayVersion.Length + 2));
+
+                            newLine += VersionHelper.CalculateVersion(newVersion);
+
+                            newLine += $"</{mauiDisplayVersion}>";
+
+                            outPutLines.Add(newLine);
+                        }
+                    }
+                    else if (aLine.Contains($"<{mauiAppVersionStr}>") && versionOptions.UpdateAppDisplayVersion == true)
+                    {
+                        var newLine = aLine;
+
+                        var pos = newLine.IndexOf($"<{mauiAppVersionStr}>");
+                        var closer = newLine.IndexOf($"</{mauiAppVersionStr}>");
+
+                        if (pos != -1 && closer != -1)
+                        {
+                            newLine = newLine.Substring(0, pos + (mauiAppVersionStr.Length + 2));
+
+                            newLine += newVersion.Major.ToString();
+
+                            newLine += $"</{mauiAppVersionStr}>";
+
+                            outPutLines.Add(newLine);
+                        }
+                    }
+                    else if (aLine.Contains($"<{verPrefix}>") && versionOptions.UpdateAssemblyVersionPrefix == true)
+                    {
+                        var newLine = aLine;
+
+                        var pos = newLine.IndexOf($"<{verPrefix}>");
+                        var closer = newLine.IndexOf($"</{verPrefix}>");
+
+                        if (pos != -1 && closer != -1)
+                        {
+                            newLine = newLine.Substring(0, pos + (verPrefix.Length + 2));
+
+                            newLine += VersionHelper.CalculateVersion(newVersion);
+
+                            newLine += $"</{verPrefix}>";
 
                             outPutLines.Add(newLine);
                         }

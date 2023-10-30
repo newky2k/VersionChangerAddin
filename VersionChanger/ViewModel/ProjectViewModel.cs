@@ -506,6 +506,30 @@ namespace DSoft.VersionChanger.ViewModel
             }
         }
 
+        public bool UpdateAppDisplayVersion
+        {
+            get { return _versionOptions.UpdateAppDisplayVersion; }
+            set
+            {
+                _versionOptions.UpdateAppDisplayVersion = value;
+                SettingsControl.SetBooleanValue(value, "UpdateAppDisplayVersion");
+                PropertyDidChange("UpdateAppDisplayVersion");
+
+            }
+        }
+
+        public bool UpdateAppVersion
+        {
+            get { return _versionOptions.UpdateAppVersion; }
+            set
+            {
+                _versionOptions.UpdateAppVersion = value;
+                SettingsControl.SetBooleanValue(value, "UpdateAppVersion");
+                PropertyDidChange("UpdateAppVersion");
+
+            }
+        }
+
         /// <summary>
         /// Enable revision as long as ForceSemVer is not ticked
         /// </summary>
@@ -565,6 +589,8 @@ namespace DSoft.VersionChanger.ViewModel
             _versionOptions.UpdatePackageVersion = SettingsControl.GetBooleanValue("UpdatePackageVersion", true);
             _versionOptions.UpdateVersion = SettingsControl.GetBooleanValue("UpdateVersion", true);
             _versionOptions.UpdateInformationalVersion = SettingsControl.GetBooleanValue("UpdateInformationalVersion", true);
+            _versionOptions.UpdateAppDisplayVersion = SettingsControl.GetBooleanValue("UpdateAppDisplayVersion", true);
+            _versionOptions.UpdateAppVersion = SettingsControl.GetBooleanValue("UpdateAppVersion", true);
 
         }
 

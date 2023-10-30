@@ -2,8 +2,7 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:vsUI="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.15.0"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:data="clr-namespace:DSoft.VersionChanger.Data" 
-                   xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
+        xmlns:data="clr-namespace:DSoft.VersionChanger.Data"
         Title="Version Changer 2022"  Height="720" Width="800" ResizeMode="NoResize" WindowStartupLocation="CenterOwner" ShowInTaskbar="False" Loaded="OnLoaded" Background="WhiteSmoke">
     <vsUI:DialogWindow.Resources>
         <ResourceDictionary Source="/VersionChanger;component/Themes/generic.xaml" />
@@ -249,14 +248,16 @@
                                         <CheckBox Margin="0,5,5,5" IsChecked="{Binding EnableRevision}" Content="Enable Revision" IsEnabled="{Binding EnableRevisionEnabled}" ToolTip="Enable revision version field"/>
                                     </StackPanel>
                                 </Grid>
-                                <GroupBox Grid.Row="1" Header="Assembly Version Options">
+                                <GroupBox Grid.Row="1" Header="Version Update Options">
                                     <WrapPanel Grid.Row="0">
                                         <CheckBox Margin="5,5,0,5" Content="Version" Width="150" IsChecked="{Binding UpdateVersion}" ToolTip="Update Version property"/>
                                         <CheckBox Margin="5,5,0,5" Content="AssemblyVersion" Width="150" IsChecked="{Binding UpdateAssemblyVersion}" ToolTip="Update AssemblyVersion property"/>
-                                        <CheckBox Margin="5,5,0,5" Content="AssemblyVersionPrefix" Width="150" IsChecked="{Binding UpdateVersionPrefix}" ToolTip="Update AssemblyVersionPrefix property"/>
-                                        <CheckBox Margin="5,5,0,5" Content="FileVersion" Width="150" IsChecked="{Binding UpdateVersionPrefix}" ToolTip="Update FileVersion (SDK) or AssemblyFileVersion (.NET Framework) properties"/>
-                                        <CheckBox Margin="5,5,0,5" Content="PackageVersion" Width="150" IsChecked="{Binding UpdateAssemblyVersion}" ToolTip="Update PackageVersion (SDK Only)"/>
+                                        <CheckBox Margin="5,5,0,5" Content="AssemblyVersionPrefix" Width="150" IsChecked="{Binding VersionPrefix}" ToolTip="Update VersionPrefix property (SDK-style only)"/>
+                                        <CheckBox Margin="5,5,0,5" Content="FileVersion" Width="150" IsChecked="{Binding UpdateVersionPrefix}" ToolTip="Update FileVersion (SDK-style) or AssemblyFileVersion (.NET Framework) properties"/>
+                                        <CheckBox Margin="5,5,0,5" Content="PackageVersion" Width="150" IsChecked="{Binding UpdateAssemblyVersion}" ToolTip="Update PackageVersion  (SDK-style only)"/>
                                         <CheckBox Margin="5,5,0,5" Content="InformationalVersion" Width="150" IsChecked="{Binding UpdateVersionPrefix}" ToolTip="Update InformationalVersion and AssemblyInformationalVersion properties"/>
+                                        <CheckBox Margin="5,5,0,5" Content="ApplicationDisplayVersion" Width="170" IsChecked="{Binding UpdateAppDisplayVersion}" ToolTip="Update ApplicationDisplayVersion property for MAUI projects"/>
+                                        <CheckBox Margin="5,5,0,5" Content="ApplicationVersion" Width="150" IsChecked="{Binding UpdateAppVersion}" ToolTip="Update ApplicationVersion property for MAUI projects"/>
                                     </WrapPanel>
                                 </GroupBox>
                                 <Grid Grid.Row="2" HorizontalAlignment="Left">

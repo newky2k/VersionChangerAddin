@@ -20,6 +20,10 @@ namespace DSoft.VersionChanger.Data
 
         public bool UpdateInformationalVersion { get; set; } = true;
 
+        public bool UpdateAppDisplayVersion { get; set; } = true;
+
+        public bool UpdateAppVersion { get; set; } = true;
+
         public bool EnableRevision { get; set; } = true;
 
         public AssemblyVersionOptions()
@@ -34,7 +38,7 @@ namespace DSoft.VersionChanger.Data
 
         public string GetVersionString(Version version)
         {
-            return (EnableRevision) ? version.ToString(3) : version.ToString(3);
+            return EnableRevision ? version.ToString() : version.ToString(3);
         }
 
         public string CalculateVersion(Version version, string versionSuffix = null, bool includeZeroRevision = false)

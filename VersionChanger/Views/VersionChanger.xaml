@@ -2,31 +2,55 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:vsUI="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.15.0"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:data="clr-namespace:DSoft.VersionChanger.Data"
-        Title="Version Changer 2022"  Height="720" Width="800" ResizeMode="NoResize" WindowStartupLocation="CenterOwner" ShowInTaskbar="False" Loaded="OnLoaded" Background="WhiteSmoke">
+        xmlns:data="clr-namespace:DSoft.VersionChanger.Data" 
+        Title="Version Changer 2022"  Height="720" Width="800" ResizeMode="NoResize" WindowStartupLocation="CenterOwner" ShowInTaskbar="False" Loaded="OnLoaded">
+    <WindowChrome.WindowChrome>
+        <WindowChrome CaptionHeight="34" />
+    </WindowChrome.WindowChrome>
     <vsUI:DialogWindow.Resources>
         <ResourceDictionary Source="/VersionChanger;component/Themes/generic.xaml" />
+        
     </vsUI:DialogWindow.Resources>
+
+    <Window.CommandBindings>
+        <CommandBinding Command="{x:Static SystemCommands.CloseWindowCommand}" CanExecute="CommandBinding_CanExecute" Executed="CommandBinding_Executed_Close" />
+    </Window.CommandBindings>
     <Grid>
         <Grid.Resources>
             <BooleanToVisibilityConverter x:Key="booleanToVisibilityConverter" />
         </Grid.Resources>
-        <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height ="Auto"/>
+            <RowDefinition Height ="*"/>
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0" Height="30" Background="{StaticResource MahApps.Brushes.Accent}">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center">
+                <!--App icon-->
+                <TextBlock Text="Version Changer 2022" FontFamily="Arial" Margin="10 3 0 0" Foreground="White"/>
+            </StackPanel>
+
+            <!--Caption buttons-->
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" >
+                <Button Style="{StaticResource CloseButtonStyle}" WindowChrome.IsHitTestVisibleInChrome="True" ToolTip="Close"
+                Command="{x:Static SystemCommands.CloseWindowCommand}"/>
+            </StackPanel>
+        </Grid>
+        <Grid Grid.Row="1">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
                 <RowDefinition Height="270" />
             </Grid.RowDefinitions>
             <StackPanel Grid.Row="0">
-                <StackPanel HorizontalAlignment="Stretch" Background="{StaticResource AccentColorBrush}"  Visibility="{Binding ShowUnloadedWarning, Converter={StaticResource booleanToVisibilityConverter}}">
+                <StackPanel HorizontalAlignment="Stretch" Background="{StaticResource MahApps.Brushes.Accent}"  Visibility="{Binding ShowUnloadedWarning, Converter={StaticResource booleanToVisibilityConverter}}">
                     <TextBlock Margin="2" HorizontalAlignment="Center" Foreground="White">Some unloaded projects were detected. Please note these will not be updated</TextBlock>
                 </StackPanel>
-                <StackPanel HorizontalAlignment="Stretch" Background="{StaticResource AccentColorBrush}"  Visibility="{Binding ShowProjectErrorWarning, Converter={StaticResource booleanToVisibilityConverter}}">
+                <StackPanel HorizontalAlignment="Stretch" Background="{StaticResource MahApps.Brushes.Accent}"  Visibility="{Binding ShowProjectErrorWarning, Converter={StaticResource booleanToVisibilityConverter}}">
                     <TextBlock Margin="2" FontSize="14" HorizontalAlignment="Center" Foreground="White" ToolTip="{Binding ProjectErrors}">Some projects could not be processed</TextBlock>
                     <TextBlock Margin="2" FontSize="12" HorizontalAlignment="Center" Foreground="White" ToolTip="{Binding ProjectErrors}">Hover here to see the errors</TextBlock>
                 </StackPanel>
             </StackPanel>
-            <Border Margin="10,10,10,5" Grid.Row="1" BorderBrush="LightGray" BorderThickness="0,0,1,1" CornerRadius="5" Background="White">
+            <Border Margin="10,10,10,5" Grid.Row="1" BorderBrush="LightGray" BorderThickness="0,0,1,1" CornerRadius="5" Background="{DynamicResource MahApps.Brushes.ThemeBackground}">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
@@ -42,13 +66,13 @@
                             </Grid.ColumnDefinitions>
                             <Label Grid.Column="0" Content="Search:" FontWeight="Bold" Margin="0,0,2,0" VerticalAlignment="Center"></Label>
                             <TextBox Grid.Column="1" Text="{Binding Filter}" Margin="1" Height="27"/>
-                            <Button Grid.Column="2" Content="Filter" Margin="3,3,10,3" Click="FilterClick" Width="95"  Style="{StaticResource AccentedSquareButtonStyle}"/>
+                            <Button Grid.Column="2" Content="Filter" Margin="3,3,10,3" Click="FilterClick" Width="95"  Style="{StaticResource MahApps.Styles.Button.Square.Accent}"/>
 
                         </Grid>
                     </Grid>
                     <Grid Grid.Row="1">
 
-                        <DataGrid ItemsSource="{Binding Items}" 
+                        <DataGrid ItemsSource="{Binding Items}"
                         CanUserAddRows="False" 
                         CanUserDeleteRows="False" 
                         CanUserResizeColumns="False" 
@@ -86,7 +110,7 @@
                     </Grid>
                 </Grid>
             </Border>
-            <Border Margin="10,0,10,10" Grid.Row="2" BorderBrush="LightGray" BorderThickness="0,0,1,1" CornerRadius="5" Background="White">
+            <Border Margin="10,0,10,10" Grid.Row="2" BorderBrush="LightGray" BorderThickness="0,0,1,1" CornerRadius="5" Background="{DynamicResource MahApps.Brushes.ThemeBackground}">
                 <TabControl>
                     <TabItem Header="Home">
                         <Grid Margin="0,0,0,5">
@@ -105,7 +129,7 @@
                                 </StackPanel>
 
                                 <Grid Grid.Row="1" HorizontalAlignment="Left">
-                                    <Button Margin="10,5,0,0" Style="{StaticResource ChromelessButtonStyle}" Click="OnClickLogo" Height="40">
+                                    <Button Margin="10,5,0,0" Style="{StaticResource MahApps.Styles.Button.Chromeless}" Click="OnClickLogo" Height="40">
                                         <Image Source="/VersionChanger;component/Resources/LoDaTek.png"/>
                                     </Button>
                                 </Grid>
@@ -216,7 +240,7 @@
 
                                 </StackPanel>
                                 <Grid Grid.Row="1" HorizontalAlignment="Right" VerticalAlignment="Bottom">
-                                    <Button Margin="0,10,10,0" Width="95" Click="OnBeginClicked" Style="{StaticResource AccentedSquareButtonStyle}">Update</Button>
+                                    <Button Margin="0,10,10,0" Width="95" Click="OnBeginClicked" Style="{StaticResource MahApps.Styles.Button.Square.Accent}">Update</Button>
                                 </Grid>
                             </Grid>
                         </Grid>
@@ -252,7 +276,7 @@
                                     <WrapPanel Grid.Row="0">
                                         <CheckBox Margin="5,5,0,5" Content="Version" Width="150" IsChecked="{Binding UpdateVersion}" ToolTip="Update Version property"/>
                                         <CheckBox Margin="5,5,0,5" Content="AssemblyVersion" Width="150" IsChecked="{Binding UpdateAssemblyVersion}" ToolTip="Update AssemblyVersion property"/>
-                                        <CheckBox Margin="5,5,0,5" Content="AssemblyVersionPrefix" Width="150" IsChecked="{Binding VersionPrefix}" ToolTip="Update VersionPrefix property (SDK-style only)"/>
+                                        <CheckBox Margin="5,5,0,5" Content="VersionPrefix" Width="170" IsChecked="{Binding UpdateVersionPrefix}" ToolTip="Update VersionPrefix property (SDK-style only)"/>
                                         <CheckBox Margin="5,5,0,5" Content="FileVersion" Width="150" IsChecked="{Binding UpdateVersionPrefix}" ToolTip="Update FileVersion (SDK-style) or AssemblyFileVersion (.NET Framework) properties"/>
                                         <CheckBox Margin="5,5,0,5" Content="PackageVersion" Width="150" IsChecked="{Binding UpdateAssemblyVersion}" ToolTip="Update PackageVersion  (SDK-style only)"/>
                                         <CheckBox Margin="5,5,0,5" Content="InformationalVersion" Width="150" IsChecked="{Binding UpdateVersionPrefix}" ToolTip="Update InformationalVersion and AssemblyInformationalVersion properties"/>
@@ -261,7 +285,7 @@
                                     </WrapPanel>
                                 </GroupBox>
                                 <Grid Grid.Row="2" HorizontalAlignment="Left">
-                                    <Button Margin="10,5,0,0" Style="{StaticResource ChromelessButtonStyle}" Click="OnClickLogo" Height="40">
+                                    <Button Margin="10,5,0,0" Style="{StaticResource MahApps.Styles.Button.Chromeless}" Click="OnClickLogo" Height="40">
                                         <Image Source="/VersionChanger;component/Resources/LoDaTek.png"/>
                                     </Button>
                                 </Grid>
@@ -273,13 +297,13 @@
             </Border>
 
         </Grid>
-        <Grid Background="#55222222" Visibility="{Binding IsBusy, Converter={StaticResource BooleanToVisibilityConverter}, FallbackValue=Hidden}" >
+        <Grid Background="#55222222" Visibility="{Binding IsBusy, Converter={StaticResource BooleanToVisibilityConverter}, FallbackValue=Hidden}" Grid.RowSpan="2">
 
-            <Border CornerRadius="5" Background="WhiteSmoke" HorizontalAlignment="Center" VerticalAlignment="Center" BorderBrush="Black" BorderThickness="1,1,1,1">
+            <Border CornerRadius="5" Background="{DynamicResource MahApps.Brushes.ThemeBackground}" HorizontalAlignment="Center" VerticalAlignment="Center" BorderBrush="{DynamicResource MahApps.Brushes.Accent}" BorderThickness="1,1,1,1">
                 <StackPanel Margin="10,10,10,10" Width="400" Height="100">
-                    <TextBlock Margin="0,0,0,10" FontWeight="Bold" Foreground="Black">Version Changer</TextBlock>
-                    <TextBlock x:Name="txtProjectsLoading" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="Black" Text="{Binding LoadingProjectsText, FallbackValue=Loading...}"/>
-                    <TextBlock Margin="0,5,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="Black" Text="{Binding CurrentProjectName, FallbackValue=Loading...}"/>
+                    <TextBlock Margin="0,0,0,10" FontWeight="Bold" Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}">Version Changer</TextBlock>
+                    <TextBlock x:Name="txtProjectsLoading" Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}" HorizontalAlignment="Left" VerticalAlignment="Center" Text="{Binding LoadingProjectsText, FallbackValue=Loading...}"/>
+                    <TextBlock Margin="0,5,0,0" Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}" HorizontalAlignment="Left" VerticalAlignment="Center"  Text="{Binding CurrentProjectName, FallbackValue=Loading...}"/>
                     <ProgressBar x:Name="pgrProgress" Height="24" Margin="0,10,0,0" Minimum="0" Maximum="{Binding TotalProjects}" Value="{Binding CurrentProject}"/>
                 </StackPanel>
 

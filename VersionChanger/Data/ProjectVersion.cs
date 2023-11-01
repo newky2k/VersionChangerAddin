@@ -302,7 +302,7 @@ namespace DSoft.VersionChanger.Data
             get
             {
                 if (_fileVersion == null) 
-                    _assemblyVersion = new Version("0, 0, 0, 0");
+                    _assemblyVersion = new Version("1, 0, 0, 0");
 
                 return _fileVersion;
             }
@@ -319,7 +319,31 @@ namespace DSoft.VersionChanger.Data
         {
             get
             {
-                return (FileVersion.Revision <= 0) ? $"{FileVersion.Major}.{FileVersion.Minor}.{FileVersion.Build}" : FileVersion.ToString();
+
+                var strVersion = "1.0";
+
+                if (FileVersion.Major >= 0)
+                {
+                    strVersion = $"{FileVersion.Major}";
+                }
+
+                if (FileVersion.Minor >= 0)
+                {
+                    strVersion = $"{strVersion}.{FileVersion.Minor}";
+                }
+
+                if (FileVersion.Build >= 0)
+                {
+                    strVersion = $"{strVersion}.{FileVersion.Build}";
+                }
+
+                if (FileVersion.Revision >= 0)
+                {
+                    strVersion = $"{strVersion}.{FileVersion.Revision}";
+                }
+
+                return strVersion;
+
             }
 
         }

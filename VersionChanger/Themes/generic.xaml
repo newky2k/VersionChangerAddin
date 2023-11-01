@@ -61,11 +61,8 @@
             </Setter.Value>
         </Setter>
     </Style>
-    
+
     <Style x:Key="CloseButtonStyle" TargetType="Button" BasedOn="{StaticResource CaptionButtonStyle}">
         <Setter Property="Content" Value="&#xE106;"/>
     </Style>
-    <!--<SolidColorBrush x:Key="MahApps.Metro.Brushes.ToggleSwitchButton.OnSwitchBrush.Win10" PresentationOptions:Freeze="True" Color="{StaticResource MahApps.Colors.Accent}" />
-    <SolidColorBrush x:Key="MahApps.Metro.Brushes.ToggleSwitchButton.OnSwitchMouseOverBrush.Win10" PresentationOptions:Freeze="True" Color="{StaticResource MahApps.Colors.Accent2}" />
-    <SolidColorBrush x:Key="MahApps.Metro.Brushes.ToggleSwitchButton.ThumbIndicatorCheckedBrush.Win10" PresentationOptions:Freeze="True" Color="{StaticResource MahApps.Colors.IdealForeground}" />-->
 </ResourceDictionary>

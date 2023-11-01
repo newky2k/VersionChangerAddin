@@ -73,8 +73,9 @@ namespace DSoft.VersionChanger.Views
 
         private void MViewModel_LoadingProgressUpdated(object sender, EventArgs e)
 		{
+#pragma warning disable VSTHRD001 // Avoid legacy thread switching APIs
             Dispatcher.Invoke(DispatcherPriority.Background, new Action(delegate { this.UpdateLayout(); }));
-
+#pragma warning restore VSTHRD001 // Avoid legacy thread switching APIs
         }
 
         private void OnBeginClicked(object sender, RoutedEventArgs e)
@@ -107,6 +108,7 @@ namespace DSoft.VersionChanger.Views
         {
             _viewModel.IsBusy = true;
 
+#pragma warning disable VSTHRD110 // Observe result of async calls
             Task.Run(() =>
             {
                 ThreadHelper.JoinableTaskFactory.Run(async delegate {
@@ -127,7 +129,8 @@ namespace DSoft.VersionChanger.Views
 
                 
             });
-           
+#pragma warning restore VSTHRD110 // Observe result of async calls
+
         }
 
         private void FilterClick(object sender, RoutedEventArgs e)

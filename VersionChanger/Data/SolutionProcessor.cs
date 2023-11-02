@@ -931,7 +931,6 @@ namespace DSoft.VersionChanger.Data
 
             foreach (Property aProp in project.Properties)
             {
-                Debug.WriteLine(aProp.Name);
 
                 if (aProp.Name.ToLower().Equals("assemblyversion"))
                 {

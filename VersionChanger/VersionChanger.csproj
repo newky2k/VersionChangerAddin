@@ -115,6 +115,8 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Resource Include="Resources\LoDaTek.png" />
+    <Content Include="Resources\MarketplaceText.html" />
+    <Content Include="Resources\MarketplaceText_2022.html" />
     <Content Include="Resources\Package.ico">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>

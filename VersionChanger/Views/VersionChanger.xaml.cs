@@ -1,4 +1,5 @@
-﻿using DSoft.VersionChanger.ViewModel;
+﻿using ControlzEx.Theming;
+using DSoft.VersionChanger.ViewModel;
 using EnvDTE;
 using Microsoft.VisualStudio.PlatformUI;
 using Microsoft.VisualStudio.Shell;
@@ -24,43 +25,57 @@ namespace DSoft.VersionChanger.Views
     /// </summary>
     public partial class VersionChanger : DialogWindow
     {
-        private ProjectViewModel mViewModel;
-
-        private const float heightShort = 500;
-        private const float heightTall = 500;
+        private ProjectViewModel _viewModel;
 
         public VersionChanger(DTE applicationObject)
         {
             InitializeComponent();
 
-            mViewModel = new ProjectViewModel(applicationObject);
+            _viewModel = new ProjectViewModel(applicationObject);
 
-            this.DataContext = mViewModel;
+            this.DataContext = _viewModel;
 
-			mViewModel.LoadingProgressUpdated += MViewModel_LoadingProgressUpdated;
+			_viewModel.LoadingProgressUpdated += MViewModel_LoadingProgressUpdated;
 
             OnUseSemVerChecked(this, null);
             OnUseSeperateVersionsChanged(this, null);
+
+            var backColor = VSColorTheme.GetThemedColor(EnvironmentColors.ToolWindowBackgroundColorKey);
+  
+            if (backColor.R * 0.2126 + backColor.G * 0.7152 + backColor.B * 0.0722 < 255 / 2)
+            {
+                // dark color
+                ThemeManager.Current.ChangeTheme(this, "Dark.Green");
+
+                var backBrush = new SolidColorBrush(Color.FromArgb(backColor.A, backColor.R, backColor.G, backColor.B));
+
+                this.Background = backBrush;
+            }
+            else
+            {
+                // light color
+                ThemeManager.Current.ChangeTheme(this, "Light.Green");
+
+                this.Background = Brushes.WhiteSmoke;
+            }  
         }
 
-		private void MViewModel_LoadingProgressUpdated(object sender, EventArgs e)
+        private void CommandBinding_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = true;
+        }
+
+        // Close
+        private void CommandBinding_Executed_Close(object sender, ExecutedRoutedEventArgs e)
+        {
+            SystemCommands.CloseWindow(this);
+        }
+
+        private void MViewModel_LoadingProgressUpdated(object sender, EventArgs e)
 		{
+#pragma warning disable VSTHRD001 // Avoid legacy thread switching APIs
             Dispatcher.Invoke(DispatcherPriority.Background, new Action(delegate { this.UpdateLayout(); }));
-
-   //         Dispatcher.Invoke((Action)(() =>
-			//{
-   //             txtProjectsLoading.Text = mViewModel.LoadingProjectsText;
-   //         }));
-
-			//ThreadHelper.JoinableTaskFactory.Run(async delegate {
-   //             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
-
-   //             await Task.Delay(1000);
-
-               
-                
-   //         });
-
+#pragma warning restore VSTHRD001 // Avoid legacy thread switching APIs
         }
 
         private void OnBeginClicked(object sender, RoutedEventArgs e)
@@ -69,41 +84,42 @@ namespace DSoft.VersionChanger.Views
 
             try
             {
-                mViewModel.ProcessUpdates();
+                _viewModel.ProcessUpdates();
 
                 this.DialogResult = true;
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, "DSoft - Version Changer");
+                MessageBox.Show(ex.Message, "Version Changer");
             }
         }
 
-        private void edtVersion_PreviewKeyDown(object sender, KeyEventArgs e)
+        private void OnPreviewKeyDown(object sender, KeyEventArgs e)
         {
 
         }
 
         private void OnToggleAllClicked(object sender, RoutedEventArgs e)
         {
-            mViewModel.SelectAll = !mViewModel.SelectAll;
+            _viewModel.SelectAll = !_viewModel.SelectAll;
         }
 
         private void OnLoaded(object sender, RoutedEventArgs e)
         {
-            mViewModel.IsBusy = true;
+            _viewModel.IsBusy = true;
 
+#pragma warning disable VSTHRD110 // Observe result of async calls
             Task.Run(() =>
             {
                 ThreadHelper.JoinableTaskFactory.Run(async delegate {
                     await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
-                    if (mViewModel.IsLoaded == false)
+                    if (_viewModel.IsLoaded == false)
                     {
-                        mViewModel.LoadProjects();
+                        _viewModel.LoadProjects();
                     }
 
-                    if (mViewModel.Items.Count == 0 && mViewModel.Errors.Count == 0)
+                    if (_viewModel.Items.Count == 0 && _viewModel.Errors.Count == 0)
                     {
                         MessageBox.Show("There were no compatible projects found in the solution");
 
@@ -113,29 +129,30 @@ namespace DSoft.VersionChanger.Views
 
                 
             });
-           
+#pragma warning restore VSTHRD110 // Observe result of async calls
+
         }
 
         private void FilterClick(object sender, RoutedEventArgs e)
         {
-            mViewModel.FilterProjects();
+            _viewModel.FilterProjects();
         }
 
         private void OnUseSemVerChecked(object sender, RoutedEventArgs e)
         {
-            hdrVersionSuffix.Visibility = mViewModel.ShowSemVer ? Visibility.Visible : Visibility.Hidden;
+            hdrVersionSuffix.Visibility = _viewModel.ShowSemVer ? Visibility.Visible : Visibility.Hidden;
         }
 
-		private void OnClickCopidal(object sender, RoutedEventArgs e)
+		private void OnClickLogo(object sender, RoutedEventArgs e)
 		{
-            var url = "https://www.copidal.com";
+            var url = "https://www.lodatek.com";
 
             System.Diagnostics.Process.Start(url);
 		}
 
 		private void OnUseSeperateVersionsChanged(object sender, RoutedEventArgs e)
 		{
-            hdrFileVersion.Visibility = mViewModel.SeparateVersions ? Visibility.Visible : Visibility.Hidden;
+            hdrFileVersion.Visibility = _viewModel.SeparateVersions ? Visibility.Visible : Visibility.Hidden;
 
         }
 	}

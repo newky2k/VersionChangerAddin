@@ -2,6 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
+using System.Runtime.ConstrainedExecution;
 using System.Text;
 
 namespace DSoft.VersionChanger.Data
@@ -15,24 +17,90 @@ namespace DSoft.VersionChanger.Data
 
 
 		private bool m_Update  = true;
-        private String m_Name;
-        private String m_Path;
-        private Version m_AssemblyVersion;
-        private Version mFileVersion;
-        private string _version;
+        private string _name;
+        private string _path;
+        private Version _assemblyVersion;
+        private Version _fileVersion;
+        private Version _packageVersion;
+        private Version _version;
+        private Version _versionPrefix;
+        private Version _mauiDisplayVersion;
+        private Version _mauiAppVersion;
+
         private string _versionSuffix;
-        private bool isNewStyleProject;
-        private string _ProjectType;
+        private string _informationalVersion;
+        private bool _isNewStyleProject;
+        private string _projectType;
 
         #endregion
 
         #region Properties
 
+        /// <summary>
+        /// Active version based on assemblyversion, versionprefix or version properties
+        /// </summary>
+        public Version ActiveVersion
+        {
+            get
+            {
+                var assemblyVersion = new List<Version>
+                {
+                    new Version("0.0.0")
+                };
+
+                if (_assemblyVersion != null)
+                    assemblyVersion.Add(_assemblyVersion);
+
+                if (_versionPrefix != null)
+                    assemblyVersion.Add(_versionPrefix);
+
+                if (_version != null)
+                    assemblyVersion.Add(_version);
+
+                assemblyVersion.Sort();
+                assemblyVersion.Reverse();
+
+                return assemblyVersion.First();
+            }
+        }
+
+        /// <summary>
+        /// Display the version information for the active version
+        /// </summary>
+        public string ActiveVersionValue
+        {
+            get
+            {
+                var strVersion = "1.0";
+
+                if (ActiveVersion.Major >= 0)
+                {
+                    strVersion = $"{ActiveVersion.Major}";
+                }
+
+                if (ActiveVersion.Minor >= 0)
+                {
+                    strVersion = $"{strVersion}.{ActiveVersion.Minor}";
+                }
+
+                if (ActiveVersion.Build >= 0)
+                {
+                    strVersion = $"{strVersion}.{ActiveVersion.Build}";
+                }
+
+                if (ActiveVersion.Revision >= 0)
+                {
+                    strVersion = $"{strVersion}.{ActiveVersion.Revision}";
+                }
+
+                return strVersion;
+            }
+        }
 
         public bool IsNewStyleProject
         {
-            get { return isNewStyleProject; }
-            set { isNewStyleProject = value; }
+            get { return _isNewStyleProject; }
+            set { _isNewStyleProject = value; }
         }
 
         /// <summary>
@@ -67,12 +135,12 @@ namespace DSoft.VersionChanger.Data
         {
             get
             {
-                return m_Name;
+                return _name;
             }
 
             set
             {
-                m_Name = value;
+                _name = value;
 
                 PropertyDidChange("Name");
             }
@@ -88,12 +156,12 @@ namespace DSoft.VersionChanger.Data
         {
             get
             {
-                return m_Path;
+                return _path;
             }
 
             set
             {
-                m_Path = value;
+                _path = value;
 
                 PropertyDidChange("Path");
             }
@@ -109,39 +177,89 @@ namespace DSoft.VersionChanger.Data
         {
             get
             {
-                if (m_AssemblyVersion == null) m_AssemblyVersion = new Version("0, 0, 0, 0");
-
-                return m_AssemblyVersion;
+                return _assemblyVersion;
             }
 
             set
             {
-                m_AssemblyVersion = value;
+                _assemblyVersion = value;
 
                 PropertyDidChange(nameof(AssemblyVersion));
             }
         }
 
-        public string AssemblyVersionValue
+        public Version PackageVersion
         {
             get
             {
-                return (AssemblyVersion.Revision <= 0) ? $"{AssemblyVersion.Major}.{AssemblyVersion.Minor}.{AssemblyVersion.Build}" : AssemblyVersion.ToString();
+                return _packageVersion;
             }
 
+            set
+            {
+                _packageVersion = value;
+
+                PropertyDidChange(nameof(PackageVersion));
+            }
         }
 
-        public string PackageVersion
+        public Version Version
         {
             get
             {
                 return _version;
             }
+
             set
             {
                 _version = value;
 
-                PropertyDidChange(nameof(PackageVersion));
+                PropertyDidChange(nameof(Version));
+            }
+        }
+
+        public Version VersionPrefix
+        {
+            get
+            {
+                return _versionPrefix;
+            }
+
+            set
+            {
+                _versionPrefix = value;
+
+                PropertyDidChange(nameof(VersionPrefix));
+            }
+        }
+
+        public Version MauiDisplayVersion
+        {
+            get
+            {
+                return _mauiDisplayVersion;
+            }
+
+            set
+            {
+                _mauiDisplayVersion = value;
+
+                PropertyDidChange(nameof(MauiDisplayVersion));
+            }
+        }
+
+        public Version MauiAppVersion
+        {
+            get
+            {
+                return _mauiAppVersion;
+            }
+
+            set
+            {
+                _mauiAppVersion = value;
+
+                PropertyDidChange(nameof(MauiAppVersion));
             }
         }
 
@@ -159,6 +277,20 @@ namespace DSoft.VersionChanger.Data
             }
         }
 
+        public string InformationalVersion
+        {
+            get
+            {
+                return _informationalVersion;
+            }
+            set
+            {
+                _informationalVersion = value;
+
+                PropertyDidChange(nameof(InformationalVersion));
+            }
+        }
+
         /// <summary>
         /// Gets or sets the file version.
         /// </summary>
@@ -169,15 +301,15 @@ namespace DSoft.VersionChanger.Data
         {
             get
             {
-                if (mFileVersion == null) 
-                    m_AssemblyVersion = new Version("0, 0, 0, 0");
+                if (_fileVersion == null) 
+                    _assemblyVersion = new Version("1, 0, 0, 0");
 
-                return mFileVersion;
+                return _fileVersion;
             }
 
             set
             {
-                mFileVersion = value;
+                _fileVersion = value;
 
                 PropertyDidChange(nameof(FileVersion));
             }
@@ -187,7 +319,31 @@ namespace DSoft.VersionChanger.Data
         {
             get
             {
-                return (FileVersion.Revision <= 0) ? $"{FileVersion.Major}.{FileVersion.Minor}.{FileVersion.Build}" : FileVersion.ToString();
+
+                var strVersion = "1.0";
+
+                if (FileVersion.Major >= 0)
+                {
+                    strVersion = $"{FileVersion.Major}";
+                }
+
+                if (FileVersion.Minor >= 0)
+                {
+                    strVersion = $"{strVersion}.{FileVersion.Minor}";
+                }
+
+                if (FileVersion.Build >= 0)
+                {
+                    strVersion = $"{strVersion}.{FileVersion.Build}";
+                }
+
+                if (FileVersion.Revision >= 0)
+                {
+                    strVersion = $"{strVersion}.{FileVersion.Revision}";
+                }
+
+                return strVersion;
+
             }
 
         }
@@ -231,8 +387,8 @@ namespace DSoft.VersionChanger.Data
        
         public string ProjectType
         {
-            get { return _ProjectType; }
-            set { _ProjectType = value; }
+            get { return _projectType; }
+            set { _projectType = value; }
         }
 
         #endregion

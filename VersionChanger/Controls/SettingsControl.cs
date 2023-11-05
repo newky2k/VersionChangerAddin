@@ -60,9 +60,10 @@ namespace DSoft.VersionChanger.Controls
 
             mIsLoaded = true;
         }
-        public static bool GetBooleanValue(String key)
+        public static bool GetBooleanValue(string key, bool defaultValue = false)
         {
-            var returnVal = false;
+            var returnVal = defaultValue;
+
             try
             {
                 returnVal = SettingsStore.GetBoolean("Version Options", key);
@@ -77,7 +78,7 @@ namespace DSoft.VersionChanger.Controls
             return returnVal;
         }
 
-        public static void SetBooleanValue(Boolean value, String key)
+        public static void SetBooleanValue(bool value, string key)
         {
             
             SettingsStore.SetBoolean("Version Options", key, value);

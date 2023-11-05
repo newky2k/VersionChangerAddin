@@ -1,4 +1,16 @@
-﻿Changes in 3.3.0
+﻿Changes in 4,0.0
+  - ARM64 support for Visual Studio on Windows Arm (2022 and above)
+  - Dark mode support. 
+	- It automatically matches Visual Studio(light or dark mode only, not blue which is light)
+  - Added support for MAUI version numbers
+	- Can update ApplicationDisplayVersion and ApplicationVersion
+  - Added support for VersionPrefix
+  - Updated the UI and split the "Options" into a new tab with more options for updating specific version properties
+  - Updated to new version of MahApps
+  - Changed branding
+  - Improvements to version calculations
+
+Changes in 3.3.0
   - Fixed binding issues with the File Version when using seperate version numbers
   - Updates to the loading of projects so that the window is shown immediately and the loading progress can be seen
   - Fixed layout of the IOS and Android version fields

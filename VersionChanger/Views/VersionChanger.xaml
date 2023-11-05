@@ -3,31 +3,54 @@
         xmlns:vsUI="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.15.0"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:data="clr-namespace:DSoft.VersionChanger.Data" 
-                   xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
-        Title="Version Changer 2022"  Height="640" Width="800" ResizeMode="NoResize" WindowStartupLocation="CenterOwner" ShowInTaskbar="False" Loaded="OnLoaded" Background="WhiteSmoke">
+        Title="Version Changer 2022"  Height="720" Width="800" ResizeMode="NoResize" WindowStartupLocation="CenterOwner" ShowInTaskbar="False" Loaded="OnLoaded">
+    <WindowChrome.WindowChrome>
+        <WindowChrome CaptionHeight="34" />
+    </WindowChrome.WindowChrome>
     <vsUI:DialogWindow.Resources>
         <ResourceDictionary Source="/VersionChanger;component/Themes/generic.xaml" />
+        
     </vsUI:DialogWindow.Resources>
+
+    <Window.CommandBindings>
+        <CommandBinding Command="{x:Static SystemCommands.CloseWindowCommand}" CanExecute="CommandBinding_CanExecute" Executed="CommandBinding_Executed_Close" />
+    </Window.CommandBindings>
     <Grid>
         <Grid.Resources>
             <BooleanToVisibilityConverter x:Key="booleanToVisibilityConverter" />
         </Grid.Resources>
-        <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height ="Auto"/>
+            <RowDefinition Height ="*"/>
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0" Height="30" Background="{StaticResource MahApps.Brushes.Accent}">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center">
+                <!--App icon-->
+                <TextBlock Text="Version Changer 2022" FontFamily="Arial" Margin="10 3 0 0" Foreground="White"/>
+            </StackPanel>
+
+            <!--Caption buttons-->
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" >
+                <Button Style="{StaticResource CloseButtonStyle}" WindowChrome.IsHitTestVisibleInChrome="True" ToolTip="Close"
+                Command="{x:Static SystemCommands.CloseWindowCommand}"/>
+            </StackPanel>
+        </Grid>
+        <Grid Grid.Row="1">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
-                <RowDefinition Height="Auto" />
+                <RowDefinition Height="270" />
             </Grid.RowDefinitions>
             <StackPanel Grid.Row="0">
-                <StackPanel HorizontalAlignment="Stretch" Background="{StaticResource AccentColorBrush}"  Visibility="{Binding ShowUnloadedWarning, Converter={StaticResource booleanToVisibilityConverter}}">
+                <StackPanel HorizontalAlignment="Stretch" Background="{StaticResource MahApps.Brushes.Accent}"  Visibility="{Binding ShowUnloadedWarning, Converter={StaticResource booleanToVisibilityConverter}}">
                     <TextBlock Margin="2" HorizontalAlignment="Center" Foreground="White">Some unloaded projects were detected. Please note these will not be updated</TextBlock>
                 </StackPanel>
-                <StackPanel HorizontalAlignment="Stretch" Background="{StaticResource AccentColorBrush}"  Visibility="{Binding ShowProjectErrorWarning, Converter={StaticResource booleanToVisibilityConverter}}">
+                <StackPanel HorizontalAlignment="Stretch" Background="{StaticResource MahApps.Brushes.Accent}"  Visibility="{Binding ShowProjectErrorWarning, Converter={StaticResource booleanToVisibilityConverter}}">
                     <TextBlock Margin="2" FontSize="14" HorizontalAlignment="Center" Foreground="White" ToolTip="{Binding ProjectErrors}">Some projects could not be processed</TextBlock>
                     <TextBlock Margin="2" FontSize="12" HorizontalAlignment="Center" Foreground="White" ToolTip="{Binding ProjectErrors}">Hover here to see the errors</TextBlock>
                 </StackPanel>
             </StackPanel>
-            <Border Margin="10,10,10,5" Grid.Row="1" BorderBrush="LightGray" BorderThickness="0,0,1,1" CornerRadius="5" Background="White">
+            <Border Margin="10,10,10,5" Grid.Row="1" BorderBrush="LightGray" BorderThickness="0,0,1,1" CornerRadius="5" Background="{DynamicResource MahApps.Brushes.ThemeBackground}">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
@@ -43,13 +66,13 @@
                             </Grid.ColumnDefinitions>
                             <Label Grid.Column="0" Content="Search:" FontWeight="Bold" Margin="0,0,2,0" VerticalAlignment="Center"></Label>
                             <TextBox Grid.Column="1" Text="{Binding Filter}" Margin="1" Height="27"/>
-                            <Button Grid.Column="2" Content="Filter" Margin="3,3,10,3" Click="FilterClick" Width="95"  Style="{StaticResource AccentedSquareButtonStyle}"/>
+                            <Button Grid.Column="2" Content="Filter" Margin="3,3,10,3" Click="FilterClick" Width="95"  Style="{StaticResource MahApps.Styles.Button.Square.Accent}"/>
 
                         </Grid>
                     </Grid>
                     <Grid Grid.Row="1">
 
-                        <DataGrid ItemsSource="{Binding Items}" 
+                        <DataGrid ItemsSource="{Binding Items}"
                         CanUserAddRows="False" 
                         CanUserDeleteRows="False" 
                         CanUserResizeColumns="False" 
@@ -60,7 +83,7 @@
                             <DataGrid.Columns>
                                 <DataGridCheckBoxColumn Header="" Width="30" Binding="{Binding Update, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                                 <DataGridTextColumn Header="Name" Width="*" Binding="{Binding Name}" IsReadOnly="True" />
-                                <DataGridTextColumn Header="Version" Width="100" Binding="{Binding AssemblyVersionValue}" IsReadOnly="True">
+                                <DataGridTextColumn Header="Version" Width="100" Binding="{Binding ActiveVersionValue}" IsReadOnly="True">
                                     <DataGridTextColumn.ElementStyle>
                                         <Style TargetType="{x:Type TextBlock}">
                                             <Setter Property="HorizontalAlignment" Value="Center" />
@@ -87,166 +110,200 @@
                     </Grid>
                 </Grid>
             </Border>
-            <Border Margin="10,0,10,10" Grid.Row="2" BorderBrush="LightGray" BorderThickness="0,0,1,1" CornerRadius="5" Background="White">
-                <Grid Margin="0,0,0,5">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="*" />
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="40" />
-                        </Grid.RowDefinitions>
+            <Border Margin="10,0,10,10" Grid.Row="2" BorderBrush="LightGray" BorderThickness="0,0,1,1" CornerRadius="5" Background="{DynamicResource MahApps.Brushes.ThemeBackground}">
+                <TabControl>
+                    <TabItem Header="Home">
+                        <Grid Margin="0,0,0,5">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="*" />
+                                    <RowDefinition Height="40" />
+                                </Grid.RowDefinitions>
 
-                        <StackPanel Grid.Row="0">
-                            <CheckBox Margin="5,10,0,5" IsChecked="{Binding SelectAll}" Content="Select/Unselect All"/>
-                        </StackPanel>
-                        <StackPanel Grid.Row="1" VerticalAlignment="Bottom">
-                            <CheckBox Margin="5,0,0,5" IsChecked="{Binding UpdateClickOnce}" Content="Update ClickOnce"/>
-                            <CheckBox Margin="5,0,0,5" IsChecked="{Binding SeparateVersions}" Content="Use seperate versions" Checked="OnUseSeperateVersionsChanged" Unchecked="OnUseSeperateVersionsChanged"/>
-                            <CheckBox Margin="5,0,0,10" IsChecked="{Binding ForceSemVer}" Checked="OnUseSemVerChecked" Unchecked="OnUseSemVerChecked" Content="Use SemVer 2.0" ToolTip="Will use Major, Minor, Build versions only for Assembly and File version. Will update nuget version for new style csproj files"/>
-                        </StackPanel>
-                        <Grid Grid.Row="2" HorizontalAlignment="Left">
-                            <Button Margin="0,0,0,0" Style="{StaticResource ChromelessButtonStyle}" Click="OnClickCopidal" Height="30">
-                                <Image Source="/VersionChanger;component/Resources/Copidal.png"/>
-                            </Button>
-                        </Grid>
-                    </Grid>
-                    <Grid Grid.Column="1" VerticalAlignment="Top" Margin="0,5,0,5">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="*" />
-                            <RowDefinition Height="40" />
-                        </Grid.RowDefinitions>
-                        <StackPanel Orientation="Vertical" HorizontalAlignment="Right">
-                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                <TextBlock VerticalAlignment="Center" Margin="0,0,5,0" Width="125">Assembly Version</TextBlock>
-                                <!--<TextBox Name="edtVersion" 
-                                 Text="{Binding AssemblyVersion}" 
-                                 Width="125" 
-                                 Margin="0,0,5,0" 
-                                 TextAlignment="Right" 
-                                 data:Masking.Mask="^[0-9][\.\d]*(,\d+)?$" />-->
-                                <TextBox 
-                                 Text="{Binding AssemblyMajor}" 
-                                 Width="50" 
-                                 Margin="0,0,5,0" 
-                                 TextAlignment="Right" 
-                                 data:Masking.Mask="^[0-9][\d]*(,\d+)?$" />
-                                <TextBox  
-                                 Text="{Binding AssemblyMinor}" 
-                                 Width="50" 
-                                 Margin="0,0,5,0" 
-                                 TextAlignment="Right" 
-                                 data:Masking.Mask="^[0-9][\d]*(,\d+)?$"  />
-                                <TextBox  
-                                 Text="{Binding AssemblyBuild}" 
-                                 Width="50" 
-                                 Margin="0,0,5,0" 
-                                 TextAlignment="Right" 
-                                 data:Masking.Mask="^[0-9][\d]*(,\d+)?$"  />
-                                <TextBox  
-                                 Text="{Binding AssesmblyRevision}" 
-                                 Width="50" 
-                                 Margin="0,0,5,0" 
-                                 TextAlignment="Right" 
-                                Visibility="{Binding ShowRevision, Converter={StaticResource booleanToVisibilityConverter}}"
-                                 data:Masking.Mask="^[0-9][\d]*(,\d+)?$"  />
-                            </StackPanel>
-                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                <TextBlock VerticalAlignment="Center" Margin="0,5,5,0" Width="125">File Version</TextBlock>
-                                <!--<TextBox Name="edtFileVersion" 
-                                 Text="{Binding FileVersion}" 
-                                 Width="125" 
-                                 Margin="0,5,0,0" 
-                                 TextAlignment="Right" 
-                                 IsEnabled="{Binding SeparateVersions}"
-                                 data:Masking.Mask="^[0-9][\.\d]*(,\d+)?$" />-->
-                                <TextBox 
-                                 Text="{Binding AssemblyFileMajor}" 
-                                 Width="50" 
-                                 Margin="0,5,5,0" 
-                                 TextAlignment="Right" 
-                                 IsEnabled="{Binding SeparateVersions}"
-                                 data:Masking.Mask="^[0-9][\d]*(,\d+)?$" />
-                                <TextBox  
-                                 Text="{Binding AssemblyFileMinor}" 
-                                 Width="50" 
-                                 Margin="0,5,5,0" 
-                                 TextAlignment="Right" 
-                                 IsEnabled="{Binding SeparateVersions}"
-                                 data:Masking.Mask="^[0-9][\d]*(,\d+)?$"  />
-                                <TextBox  
-                                 Text="{Binding AssemblyFileBuild}" 
-                                 Width="50" 
-                                 Margin="0,5,5,0" 
-                                 TextAlignment="Right" 
-                                 IsEnabled="{Binding SeparateVersions}"
-                                 data:Masking.Mask="^[0-9][\d]*(,\d+)?$"  />
-                                <TextBox  
-                                 Text="{Binding AssesmblyFileRevision}" 
-                                 Width="50" 
-                                 Margin="0,5,5,0" 
-                                 TextAlignment="Right" 
-                                 IsEnabled="{Binding SeparateVersions}"
-                                Visibility="{Binding ShowRevision, Converter={StaticResource booleanToVisibilityConverter}}"
-                                 data:Masking.Mask="^[0-9][\d]*(,\d+)?$"  />
-                            </StackPanel>
-                            <Grid VerticalAlignment="Center" x:Name="secPre" Visibility="{Binding ShowSemVer, Converter={StaticResource booleanToVisibilityConverter}}">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="*" />
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Column="0" VerticalAlignment="Center" Margin="0,5,5,0" Width="125" ToolTip="Pre-release label, alphanumberic (+ hyphen) string i.e for beta1 you get 1.0.0-beta1" >Version Suffix (optional)</TextBlock>
-                                <TextBox  Grid.Column="1"
-                                 Text="{Binding PreRelase}" 
-                                 Margin="0,5,5,0" 
-                                 TextAlignment="Right" 
-                                 data:Masking.Mask="^[0-9A-Za-z-]*$"  />
-                            </Grid>
-                            <Grid VerticalAlignment="Center" x:Name="secIos" Visibility="{Binding ShowIos, Converter={StaticResource booleanToVisibilityConverter}}">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="*" />
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Column="0" VerticalAlignment="Center" Margin="0,5,5,0" Width="125">iOS/Mac Short Version</TextBlock>
-                                <TextBox Name="edtiOSVersion" Grid.Column="1"
-                                 Text="{Binding CocoaShortVersion}" 
-                                 Margin="0,5,5,0" 
-                                 TextAlignment="Right" 
-                                 data:Masking.Mask="^[0-9][\.\d]*(,\d+)?$" />
-                            </Grid>
-                            <Grid VerticalAlignment="Center" x:Name="secAndroid" Visibility="{Binding ShowAndroid, Converter={StaticResource booleanToVisibilityConverter}}">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="*" />
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Column="0" VerticalAlignment="Center" Margin="0,5,5,0" Width="125">Android Version Code</TextBlock>
-                                <TextBox Grid.Column="1" Name="edtAndFileVersion" 
-                                 Text="{Binding AndroidBuild}" 
-                                
-                                 Margin="0,5,5,0"  
-                                 TextAlignment="Right" 
-                                 data:Masking.Mask="^[0-9][\.\d]*(,\d+)?$" />
-                            </Grid>
+                                <StackPanel Grid.Row="0">
+                                    <CheckBox Margin="5,10,0,5" IsChecked="{Binding SelectAll}" Content="Select/Unselect All"/>
+                                </StackPanel>
 
-                        </StackPanel>
-                        <Grid Grid.Row="1" HorizontalAlignment="Right">
-                            <Button Margin="0,10,10,0" Width="95" Click="OnBeginClicked" Style="{StaticResource AccentedSquareButtonStyle}">Update</Button>
+                                <Grid Grid.Row="1" HorizontalAlignment="Left">
+                                    <Button Margin="10,5,0,0" Style="{StaticResource MahApps.Styles.Button.Chromeless}" Click="OnClickLogo" Height="40">
+                                        <Image Source="/VersionChanger;component/Resources/LoDaTek.png"/>
+                                    </Button>
+                                </Grid>
+                            </Grid>
+                            <Grid Grid.Column="1" Margin="0,5,0,0">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="*" />
+                                    <RowDefinition Height="40" />
+                                </Grid.RowDefinitions>
+                                <StackPanel Orientation="Vertical" HorizontalAlignment="Right" VerticalAlignment="Top">
+                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                        <TextBlock VerticalAlignment="Center" Margin="0,0,5,0" Width="125">Assembly Version</TextBlock>
+                                        <TextBox 
+                                            Text="{Binding AssemblyMajor}" 
+                                            Width="50" 
+                                            Margin="0,0,5,0" 
+                                            TextAlignment="Right" 
+                                            data:Masking.Mask="^[0-9][\d]*(,\d+)?$" />
+                                        <TextBox  
+                                            Text="{Binding AssemblyMinor}" 
+                                            Width="50" 
+                                            Margin="0,0,5,0" 
+                                            TextAlignment="Right" 
+                                            data:Masking.Mask="^[0-9][\d]*(,\d+)?$"  />
+                                        <TextBox  
+                                            Text="{Binding AssemblyBuild}" 
+                                            Width="50" 
+                                            Margin="0,0,5,0" 
+                                            TextAlignment="Right" 
+                                            data:Masking.Mask="^[0-9][\d]*(,\d+)?$"  />
+                                        <TextBox  
+                                            Text="{Binding AssesmblyRevision}" 
+                                            Width="50" 
+                                            Margin="0,0,5,0" 
+                                            TextAlignment="Right" 
+                                            Visibility="{Binding EnableRevision, Converter={StaticResource booleanToVisibilityConverter}}"
+                                            data:Masking.Mask="^[0-9][\d]*(,\d+)?$"  />
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center"  Visibility="{Binding SeparateVersions, Converter={StaticResource booleanToVisibilityConverter}}">
+                                        <TextBlock VerticalAlignment="Center" Margin="0,5,5,0" Width="125">File Version</TextBlock>
+                                        <TextBox 
+                                            Text="{Binding AssemblyFileMajor}" 
+                                            Width="50" 
+                                            Margin="0,5,5,0" 
+                                            TextAlignment="Right" 
+                                            IsEnabled="{Binding SeparateVersions}"
+                                            data:Masking.Mask="^[0-9][\d]*(,\d+)?$" />
+                                        <TextBox  
+                                            Text="{Binding AssemblyFileMinor}" 
+                                            Width="50" 
+                                            Margin="0,5,5,0" 
+                                            TextAlignment="Right" 
+                                            IsEnabled="{Binding SeparateVersions}"
+                                            data:Masking.Mask="^[0-9][\d]*(,\d+)?$"  />
+                                        <TextBox  
+                                            Text="{Binding AssemblyFileBuild}" 
+                                            Width="50" 
+                                            Margin="0,5,5,0" 
+                                            TextAlignment="Right" 
+                                            IsEnabled="{Binding SeparateVersions}"
+                                            data:Masking.Mask="^[0-9][\d]*(,\d+)?$"  />
+                                        <TextBox  
+                                            Text="{Binding AssesmblyFileRevision}" 
+                                            Width="50" 
+                                            Margin="0,5,5,0" 
+                                            TextAlignment="Right" 
+                                            IsEnabled="{Binding SeparateVersions}"
+                                           Visibility="{Binding EnableRevision, Converter={StaticResource booleanToVisibilityConverter}}"
+                                            data:Masking.Mask="^[0-9][\d]*(,\d+)?$"  />
+                                    </StackPanel>
+                                    <Grid VerticalAlignment="Center" x:Name="secPre" Visibility="{Binding ShowSemVer, Converter={StaticResource booleanToVisibilityConverter}}">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" VerticalAlignment="Center" Margin="0,5,5,0" Width="125" ToolTip="Pre-release label, alphanumberic (+ hyphen) string i.e for beta1 you get 1.0.0-beta1" >Version Suffix (optional)</TextBlock>
+                                        <TextBox  Grid.Column="1"
+                                Text="{Binding PreRelase}" 
+                                Margin="0,5,5,0" 
+                                TextAlignment="Right" 
+                                data:Masking.Mask="^[0-9A-Za-z-]*$"  />
+                                    </Grid>
+                                    <Grid VerticalAlignment="Center" x:Name="secIos" Visibility="{Binding ShowIos, Converter={StaticResource booleanToVisibilityConverter}}">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" VerticalAlignment="Center" Margin="0,5,5,0" Width="125">iOS/Mac Short Version</TextBlock>
+                                        <TextBox Name="edtiOSVersion" Grid.Column="1"
+                                Text="{Binding CocoaShortVersion}" 
+                                Margin="0,5,5,0" 
+                                TextAlignment="Right" 
+                                data:Masking.Mask="^[0-9][\.\d]*(,\d+)?$" />
+                                    </Grid>
+                                    <Grid VerticalAlignment="Center" x:Name="secAndroid" Visibility="{Binding ShowAndroid, Converter={StaticResource booleanToVisibilityConverter}}">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" VerticalAlignment="Center" Margin="0,5,5,0" Width="125">Android Version Code</TextBlock>
+                                        <TextBox Grid.Column="1" Name="edtAndFileVersion" 
+                                Text="{Binding AndroidBuild}" 
+                               
+                                Margin="0,5,5,0"  
+                                TextAlignment="Right" 
+                                data:Masking.Mask="^[0-9][\.\d]*(,\d+)?$" />
+                                    </Grid>
+
+                                </StackPanel>
+                                <Grid Grid.Row="1" HorizontalAlignment="Right" VerticalAlignment="Bottom">
+                                    <Button Margin="0,10,10,0" Width="95" Click="OnBeginClicked" Style="{StaticResource MahApps.Styles.Button.Square.Accent}">Update</Button>
+                                </Grid>
+                            </Grid>
                         </Grid>
-                    </Grid>
-                </Grid>
+                    </TabItem>
+                    <TabItem Header="Options">
+                        <Grid Margin="0,0,0,5">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="*" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="40" />
+                                </Grid.RowDefinitions>
+
+                                <Grid Grid.Row="0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition />
+                                        <ColumnDefinition />
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel>
+                                        <CheckBox Margin="5,5,0,5" IsChecked="{Binding UpdateClickOnce}" Content="Update ClickOnce" ToolTip="Update clickonce version numbers"/>
+                                        <CheckBox Margin="5,0,0,5" IsChecked="{Binding SeparateVersions}" Content="Use seperate versions" Checked="OnUseSeperateVersionsChanged" Unchecked="OnUseSeperateVersionsChanged" ToolTip="Use different assembly and file versions"/>
+                                        <CheckBox Margin="5,0,0,10" IsChecked="{Binding ForceSemVer}" Checked="OnUseSemVerChecked" Unchecked="OnUseSemVerChecked" Content="Use SemVer 2.0" ToolTip="Will use Major, Minor, Build versions only for Assembly and File version. Will update nuget version for new style csproj files. Disbales 'Enable Revision'"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="1" HorizontalAlignment="Right">
+                                        <CheckBox Margin="0,5,5,5" IsChecked="{Binding EnableRevision}" Content="Enable Revision" IsEnabled="{Binding EnableRevisionEnabled}" ToolTip="Enable revision version field"/>
+                                    </StackPanel>
+                                </Grid>
+                                <GroupBox Grid.Row="1" Header="Version Update Options">
+                                    <WrapPanel Grid.Row="0">
+                                        <CheckBox Margin="5,5,0,5" Content="Version" Width="150" IsChecked="{Binding UpdateVersion}" ToolTip="Update Version property"/>
+                                        <CheckBox Margin="5,5,0,5" Content="AssemblyVersion" Width="150" IsChecked="{Binding UpdateAssemblyVersion}" ToolTip="Update AssemblyVersion property"/>
+                                        <CheckBox Margin="5,5,0,5" Content="VersionPrefix" Width="170" IsChecked="{Binding UpdateVersionPrefix}" ToolTip="Update VersionPrefix property (SDK-style only)"/>
+                                        <CheckBox Margin="5,5,0,5" Content="FileVersion" Width="150" IsChecked="{Binding UpdateVersionPrefix}" ToolTip="Update FileVersion (SDK-style) or AssemblyFileVersion (.NET Framework) properties"/>
+                                        <CheckBox Margin="5,5,0,5" Content="PackageVersion" Width="150" IsChecked="{Binding UpdateAssemblyVersion}" ToolTip="Update PackageVersion  (SDK-style only)"/>
+                                        <CheckBox Margin="5,5,0,5" Content="InformationalVersion" Width="150" IsChecked="{Binding UpdateVersionPrefix}" ToolTip="Update InformationalVersion and AssemblyInformationalVersion properties"/>
+                                        <CheckBox Margin="5,5,0,5" Content="ApplicationDisplayVersion" Width="170" IsChecked="{Binding UpdateAppDisplayVersion}" ToolTip="Update ApplicationDisplayVersion property for MAUI projects"/>
+                                        <CheckBox Margin="5,5,0,5" Content="ApplicationVersion" Width="150" IsChecked="{Binding UpdateAppVersion}" ToolTip="Update ApplicationVersion property for MAUI projects"/>
+                                    </WrapPanel>
+                                </GroupBox>
+                                <Grid Grid.Row="2" HorizontalAlignment="Left">
+                                    <Button Margin="10,5,0,0" Style="{StaticResource MahApps.Styles.Button.Chromeless}" Click="OnClickLogo" Height="40">
+                                        <Image Source="/VersionChanger;component/Resources/LoDaTek.png"/>
+                                    </Button>
+                                </Grid>
+                            </Grid>
+                        </Grid>
+                    </TabItem>
+                </TabControl>
+
             </Border>
 
         </Grid>
-        <Grid Background="#55222222" Visibility="{Binding IsBusy, Converter={StaticResource BooleanToVisibilityConverter}, FallbackValue=Hidden}" >
+        <Grid Background="#55222222" Visibility="{Binding IsBusy, Converter={StaticResource BooleanToVisibilityConverter}, FallbackValue=Hidden}" Grid.RowSpan="2">
 
-            <Border CornerRadius="5" Background="WhiteSmoke" HorizontalAlignment="Center" VerticalAlignment="Center" BorderBrush="Black" BorderThickness="1,1,1,1">
+            <Border CornerRadius="5" Background="{DynamicResource MahApps.Brushes.ThemeBackground}" HorizontalAlignment="Center" VerticalAlignment="Center" BorderBrush="{DynamicResource MahApps.Brushes.Accent}" BorderThickness="1,1,1,1">
                 <StackPanel Margin="10,10,10,10" Width="400" Height="100">
-                    <TextBlock Margin="0,0,0,10" FontWeight="Bold" Foreground="Black">Version Changer</TextBlock>
-                    <TextBlock x:Name="txtProjectsLoading" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="Black" Text="{Binding LoadingProjectsText, FallbackValue=Loading...}"/>
-                    <TextBlock Margin="0,5,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="Black" Text="{Binding CurrentProjectName, FallbackValue=Loading...}"/>
+                    <TextBlock Margin="0,0,0,10" FontWeight="Bold" Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}">Version Changer</TextBlock>
+                    <TextBlock x:Name="txtProjectsLoading" Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}" HorizontalAlignment="Left" VerticalAlignment="Center" Text="{Binding LoadingProjectsText, FallbackValue=Loading...}"/>
+                    <TextBlock Margin="0,5,0,0" Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}" HorizontalAlignment="Left" VerticalAlignment="Center"  Text="{Binding CurrentProjectName, FallbackValue=Loading...}"/>
                     <ProgressBar x:Name="pgrProgress" Height="24" Margin="0,10,0,0" Minimum="0" Maximum="{Binding TotalProjects}" Value="{Binding CurrentProject}"/>
                 </StackPanel>
 
@@ -254,5 +311,5 @@
 
         </Grid>
     </Grid>
- 
+
 </vsUI:DialogWindow>

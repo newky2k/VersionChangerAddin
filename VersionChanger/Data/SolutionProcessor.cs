@@ -1,4 +1,5 @@
-﻿using DSoft.VersionChanger.Helpers;
+﻿using DSoft.VersionChanger.Extensions;
+using DSoft.VersionChanger.Helpers;
 using EnvDTE;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Flavor;
@@ -172,7 +173,14 @@ namespace DSoft.VersionChanger.Data
             return versions;
         }
 
-        internal void UpdateProject(Project realProject, Version newVersion, Version fileVersion = null, string versionSuffix = null)
+        /// <summary>
+        /// Update an SDK style csproj
+        /// </summary>
+        /// <param name="realProject"></param>
+        /// <param name="newVersion"></param>
+        /// <param name="fileVersion"></param>
+        /// <param name="versionSuffix"></param>
+        internal void UpdateSdkProject(Project realProject, AssemblyVersionOptions versionOptions, Version newVersion, Version fileVersion = null, string versionSuffix = null)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
@@ -180,37 +188,41 @@ namespace DSoft.VersionChanger.Data
             {
                 var lowerCase = aProp.Name.ToLower();
 
-                if (lowerCase.Equals("assemblyversion"))
+                if (lowerCase.Equals("assemblyversion") && versionOptions.UpdateAssemblyVersion == true)
                 {
-                    aProp.Value = (newVersion.Revision == -1) ? newVersion.ToString(3) : newVersion.ToString();
+                    aProp.Value = versionOptions.GetVersionString(newVersion);
                 }
-                else if (lowerCase.Equals("fileversion"))
+                else if (lowerCase.Equals("versionprefix") && versionOptions.UpdateAssemblyVersionPrefix == true)
+                {
+                    aProp.Value = versionOptions.GetVersionString(newVersion);
+                }
+                else if (lowerCase.Equals("fileversion") && versionOptions.UpdateFileVersion == true)
                 {
                     var fVersion = (fileVersion == null) ? newVersion : fileVersion;
 
-                    aProp.Value = (fVersion.Revision == -1) ? fVersion.ToString(3) : fVersion.ToString();
+                    aProp.Value = versionOptions.GetVersionString(fVersion);
                 }
-                else if (lowerCase.Equals("version"))
+                else if (lowerCase.Equals("version") && versionOptions.UpdateVersion == true)
                 {
-                    var str = VersionHelper.CalculateVersion(newVersion, versionSuffix);
+                    var str = versionOptions.CalculateVersion(newVersion, versionSuffix);
 
                     aProp.Value = str;
 
                 }
-                else if (lowerCase.Equals("versionsuffix"))
+                else if (lowerCase.Equals("versionsuffix") && !string.IsNullOrWhiteSpace(versionSuffix))
                 {
                     aProp.Value = versionSuffix;
                 }
-                else if (lowerCase.Equals("packageversion", StringComparison.OrdinalIgnoreCase))
+                else if (lowerCase.Equals("packageversion", StringComparison.OrdinalIgnoreCase) && versionOptions.UpdatePackageVersion == true)
                 {
-                    var str = VersionHelper.CalculateVersion(newVersion, versionSuffix);
+                    var str = versionOptions.CalculateVersion(newVersion, versionSuffix);
 
                     aProp.Value = str;
 
                 }
-                else if (lowerCase.Equals("assemblyinformationalversion") || aProp.Name.ToLower().Equals("informationalversion"))
+                else if (lowerCase.Equals("assemblyinformationalversion") || aProp.Name.ToLower().Equals("informationalversion") && versionOptions.UpdateInformationalVersion == true)
                 {
-                    var str = VersionHelper.CalculateVersion(newVersion, versionSuffix);
+                    var str = versionOptions.CalculateVersion(newVersion, versionSuffix);
 
                     aProp.Value = str;
 
@@ -224,48 +236,105 @@ namespace DSoft.VersionChanger.Data
             var txt = File.ReadAllLines(realProject.FileName);
             var searchableText = string.Join("", txt);
 
-            var seachText = "InformationalVersion";
-            var seachText2 = "PackageVersion";
+            var infoVersion = "InformationalVersion";
+            var packVer = "PackageVersion";
+            var mauiDisplayVersion = "ApplicationDisplayVersion";
+            var mauiAppVersionStr = "ApplicationVersion";
+            var verPrefix = "VersionPrefix";
 
             var outPutLines = new List<string>();
 
             //update informational version and package version
-            if (searchableText.Contains(seachText) || searchableText.Contains(seachText2))
+            if (searchableText.Contains(infoVersion) || searchableText.Contains(packVer) || searchableText.Contains(mauiDisplayVersion) || searchableText.Contains(mauiAppVersionStr) || searchableText.Contains(verPrefix))
             {
                 foreach (var aLine in txt)
                 {
-                    if (aLine.Contains($"<{seachText}>"))
+                    if (aLine.Contains($"<{infoVersion}>") && versionOptions.UpdateInformationalVersion == true)
                     {
                         var newLine = aLine;
 
-                        var pos = newLine.IndexOf($"<{seachText}>");
-                        var closer = newLine.IndexOf($"</{seachText}>");
+                        var pos = newLine.IndexOf($"<{infoVersion}>");
+                        var closer = newLine.IndexOf($"</{infoVersion}>");
 
                         if (pos != -1 && closer != -1)
                         {
-                            newLine = newLine.Substring(0, pos + (seachText.Length + 2));
+                            newLine = newLine.Substring(0, pos + (infoVersion.Length + 2));
 
                             newLine += VersionHelper.CalculateVersion(newVersion, versionSuffix);
 
-                            newLine += $"</{seachText}>";
+                            newLine += $"</{infoVersion}>";
 
                             outPutLines.Add(newLine);
                         }
                     }
-                    else if (aLine.Contains($"<{seachText2}>"))
+                    else if (aLine.Contains($"<{packVer}>") && versionOptions.UpdatePackageVersion == true)
                     {
                         var newLine = aLine;
 
-                        var pos = newLine.IndexOf($"<{seachText2}>");
-                        var closer = newLine.IndexOf($"</{seachText2}>");
+                        var pos = newLine.IndexOf($"<{packVer}>");
+                        var closer = newLine.IndexOf($"</{packVer}>");
 
                         if (pos != -1 && closer != -1)
                         {
-                            newLine = newLine.Substring(0, pos + (seachText2.Length + 2));
+                            newLine = newLine.Substring(0, pos + (packVer.Length + 2));
 
                             newLine += VersionHelper.CalculateVersion(newVersion, versionSuffix);
 
-                            newLine += $"</{seachText2}>";
+                            newLine += $"</{packVer}>";
+
+                            outPutLines.Add(newLine);
+                        }
+                    }
+                    else if (aLine.Contains($"<{mauiDisplayVersion}>") && versionOptions.UpdateAppDisplayVersion == true)
+                    {
+                        var newLine = aLine;
+
+                        var pos = newLine.IndexOf($"<{mauiDisplayVersion}>");
+                        var closer = newLine.IndexOf($"</{mauiDisplayVersion}>");
+
+                        if (pos != -1 && closer != -1)
+                        {
+                            newLine = newLine.Substring(0, pos + (mauiDisplayVersion.Length + 2));
+
+                            newLine += VersionHelper.CalculateVersion(newVersion);
+
+                            newLine += $"</{mauiDisplayVersion}>";
+
+                            outPutLines.Add(newLine);
+                        }
+                    }
+                    else if (aLine.Contains($"<{mauiAppVersionStr}>") && versionOptions.UpdateAppDisplayVersion == true)
+                    {
+                        var newLine = aLine;
+
+                        var pos = newLine.IndexOf($"<{mauiAppVersionStr}>");
+                        var closer = newLine.IndexOf($"</{mauiAppVersionStr}>");
+
+                        if (pos != -1 && closer != -1)
+                        {
+                            newLine = newLine.Substring(0, pos + (mauiAppVersionStr.Length + 2));
+
+                            newLine += newVersion.Major.ToString();
+
+                            newLine += $"</{mauiAppVersionStr}>";
+
+                            outPutLines.Add(newLine);
+                        }
+                    }
+                    else if (aLine.Contains($"<{verPrefix}>") && versionOptions.UpdateAssemblyVersionPrefix == true)
+                    {
+                        var newLine = aLine;
+
+                        var pos = newLine.IndexOf($"<{verPrefix}>");
+                        var closer = newLine.IndexOf($"</{verPrefix}>");
+
+                        if (pos != -1 && closer != -1)
+                        {
+                            newLine = newLine.Substring(0, pos + (verPrefix.Length + 2));
+
+                            newLine += VersionHelper.CalculateVersion(newVersion);
+
+                            newLine += $"</{verPrefix}>";
 
                             outPutLines.Add(newLine);
                         }
@@ -282,12 +351,12 @@ namespace DSoft.VersionChanger.Data
         }
 
         /// <summary>
-        /// Updates the file.
+        /// Update an old framework style csproj
         /// </summary>
         /// <param name="item">The item.</param>
         /// <param name="newAssemblyVersion">The new assembly version.</param>
         /// <param name="newFileVersion">The new file version.</param>
-        public void UpdateFile(ProjectItem item, Version newAssemblyVersion, Version newFileVersion = null, string versionSuffix = null)
+        public void UpdateFrameworkProject(ProjectItem item, AssemblyVersionOptions versionOptions, Version newAssemblyVersion, Version newFileVersion = null, string versionSuffix = null)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
@@ -331,7 +400,7 @@ namespace DSoft.VersionChanger.Data
 
                     if (aLine.ToLower().Contains(assemblyText))
                     {
-                        if (aLine.Contains(searchText))
+                        if (aLine.Contains(searchText) && versionOptions.UpdateAssemblyVersion == true)
                         {
                             //now get the version number
                             int locationStart = aLine.IndexOf(searchText);
@@ -356,7 +425,7 @@ namespace DSoft.VersionChanger.Data
 
                         }
 
-                        if (aLine.Contains(searchText2))
+                        if (aLine.Contains(searchText2) && versionOptions.UpdateFileVersion == true)
                         {
                             int locationStart = aLine.IndexOf(searchText2);
                             var searchLength = searchText2.Length;
@@ -381,7 +450,7 @@ namespace DSoft.VersionChanger.Data
 
                         }
 
-                        if (aLine.Contains(searchText3))
+                        if (aLine.Contains(searchText3) && versionOptions.UpdateInformationalVersion == true)
                         {
                             int locationStart = aLine.IndexOf(searchText3);
                             var searchLength = searchText3.Length;
@@ -422,14 +491,6 @@ namespace DSoft.VersionChanger.Data
                     lastLine = true;
 
             }
-
-            //if (updatedVersionSuffix == false && string.IsNullOrEmpty(versionSuffix) == false)
-            //{
-            //    var newFileVersionValue = (newFileVersion.Revision == -1) ? $"{newFileVersion.Major}.{newFileVersion.Minor}.{newFileVersion.Build}.0" : newFileVersion.ToString();
-            //    newFileVersionValue += $"-{versionSuffix}";
-            //    var newLine = String.Format("[assembly: AssemblyInformationalVersion(\"{0}\")]\r\n", newFileVersionValue);
-            //    objEditPt.Insert(newLine);
-            //}
 
             item.Save();
             aDoc.Close();
@@ -856,26 +917,40 @@ namespace DSoft.VersionChanger.Data
         /// <returns></returns>
         private ProjectVersion ProcessNewStyleProject(Project project)
         {
-            var version = string.Empty;
+            var assemblyVersion = string.Empty;
             var fileVersion = string.Empty;
             var packageVersion = string.Empty;
             var versionSuffix = string.Empty;
+            var version = string.Empty;
+            var versionPrefix = string.Empty;
+            var informationVersion = string.Empty;
+            var mauiAppDisplayVersion = string.Empty;
+            var mauiAppVersion = string.Empty;
 
             ThreadHelper.ThrowIfNotOnUIThread();
 
             foreach (Property aProp in project.Properties)
             {
+
                 if (aProp.Name.ToLower().Equals("assemblyversion"))
                 {
-                    version = aProp.Value as String;
+                    assemblyVersion = aProp.Value as string;
                 }
                 else if (aProp.Name.ToLower().Equals("fileversion"))
                 {
-                    fileVersion = aProp.Value as String;
+                    fileVersion = aProp.Value as string;
                 }
                 else if (aProp.Name.ToLower().Equals("version"))
                 {
-                    packageVersion = aProp.Value as String;
+                    version = aProp.Value as string;
+                }
+                else if (aProp.Name.ToLower().Equals("versionprefix"))
+                {
+                    versionPrefix = aProp.Value as string;
+                }
+                else if (aProp.Name.ToLower().Equals("packageversion"))
+                {
+                    packageVersion = aProp.Value as string;
                     if (packageVersion.Contains("-") && string.IsNullOrEmpty(versionSuffix))
                     {
                         var start = packageVersion.IndexOf("-");
@@ -885,48 +960,141 @@ namespace DSoft.VersionChanger.Data
                 }
                 else if (aProp.Name.ToLower().Equals("versionsuffix"))
                 {
-                    versionSuffix = aProp.Value as String;
+                    versionSuffix = aProp.Value as string;
+                }
+            }
+
+
+            //Update some properties via the xml, such as InformationalVersion
+            var txt = File.ReadAllLines(project.FileName);
+            var searchableText = string.Join("", txt);
+
+            var infoVersion = "InformationalVersion";
+            var verPrefix = "VersionPrefix";
+            var mauiDisplayVersion = "ApplicationDisplayVersion";
+            var mauiAppVersionStr = "ApplicationVersion";
+
+            //update informational version and package version
+            if (searchableText.Contains(infoVersion) || searchableText.Contains(verPrefix) || searchableText.Contains(mauiDisplayVersion) || searchableText.Contains(mauiAppVersionStr))
+            {
+                foreach (var aLine in txt)
+                {
+                    if (aLine.Contains($"<{infoVersion}>"))
+                    {
+                        informationVersion = aLine.ValueForNode(infoVersion);
+                    }
+                    else if (aLine.Contains($"<{verPrefix}>"))
+                    {
+                        versionPrefix = aLine.ValueForNode(verPrefix);
+                    }
+                    else if (aLine.Contains($"<{mauiDisplayVersion}>"))
+                    {
+                        mauiAppDisplayVersion = aLine.ValueForNode(mauiDisplayVersion);
+                    }
+                    else if (aLine.Contains($"<{mauiAppVersionStr}>"))
+                    {
+                        mauiAppVersion = aLine.ValueForNode(mauiAppVersionStr);
+                    }
+
                 }
             }
 
             //is this using the new style csproj
+            var newVersion = new ProjectVersion();
+            newVersion.Name = project.Name;
+            newVersion.Path = project.FileName;
+            newVersion.RealProject = project;
+            newVersion.IsNewStyleProject = true;
+            newVersion.ProjectType = "SDK";
+            newVersion.VersionSuffix = versionSuffix;
+            newVersion.InformationalVersion = informationVersion;
 
-            if (version != String.Empty)
-            {
-                //MessageBox.Show(String.Format("{0} \n {1}", proj.Name, version));
-                var newVersion = new ProjectVersion();
-                newVersion.Name = project.Name;
-                newVersion.Path = project.FileName;
-                newVersion.RealProject = project;
-                newVersion.IsNewStyleProject = true;
-                newVersion.ProjectType = "SDK";
-                newVersion.VersionSuffix = versionSuffix;
+            if (assemblyVersion != string.Empty)
+            {               
                 try
                 {
-                    newVersion.AssemblyVersion = new Version(version);
+                    newVersion.AssemblyVersion = new Version(assemblyVersion);
                 }
                 catch
                 {
-                    newVersion.AssemblyVersion = new Version("1.0");
+                   
                 }
-
-                if (fileVersion != String.Empty)
-                {
-                    try
-                    {
-                        newVersion.FileVersion = new Version(fileVersion);
-                    }
-                    catch
-                    {
-                        newVersion.FileVersion = newVersion.AssemblyVersion;
-                    }
-                }
-
-                return newVersion;
 
             }
 
-            return null;
+            if (fileVersion != string.Empty)
+            {
+                try
+                {
+                    newVersion.FileVersion = new Version(fileVersion);
+                }
+                catch
+                {
+                    newVersion.FileVersion = newVersion.AssemblyVersion;
+                }
+            }
+
+            if (version != string.Empty)
+            {
+                try
+                {
+                    newVersion.Version = new Version(version);
+                }
+                catch
+                {
+                    
+                }
+            }
+
+            if (packageVersion != string.Empty)
+            {
+                try
+                {
+                    newVersion.PackageVersion = new Version(packageVersion);
+                }
+                catch
+                {
+
+                }
+            }
+
+            if (versionPrefix != string.Empty)
+            {
+                try
+                {
+                    newVersion.VersionPrefix = new Version(versionPrefix);
+                }
+                catch
+                {
+
+                }
+            }
+
+            if (mauiAppDisplayVersion != string.Empty)
+            {
+                try
+                {
+                    newVersion.MauiDisplayVersion = new Version(mauiAppDisplayVersion);
+                }
+                catch
+                {
+
+                }
+            }
+
+            if (mauiAppVersion != string.Empty)
+            {
+                try
+                {
+                    newVersion.MauiAppVersion = new Version(mauiAppVersion);
+                }
+                catch
+                {
+
+                }
+            }
+
+            return newVersion;
         }
 
         public void Dispose()

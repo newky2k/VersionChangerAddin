@@ -1,0 +1,110 @@
+<html>
+
+<body>
+   ![DarkMode.png](DarkMode.png)
+   <p>Version Changer is a Visual Studio extension that makes it simple to change the version numbers of all the
+      projects in a solution.</p>
+   <p>Version Changer will detect what type of project it is and update it accordingly, using AssemeblyInfo in old
+      csproj projects for example but &lt;version&gt; in new style csproj projects.</p>
+   <p>It can also update Xamarin.Android, Xamarin.iOS projects.&nbsp;</p>
+   <p>Version changer can update the following values:</p>
+   <ul>
+      <li>Version (AssemblyVersion)</li>
+      <li>File Version (AsemblyFileVersion)</li>
+      <li>InformationalVersion (AssemblyInformationalVersion)</li>
+      <li>PackageVersion</li>
+      <li>Click once version </li>
+      <li>Android manifiest versions </li>
+      <li>iOS and Mac info.plist versions</li>
+      <li>package.appxmanifest versions</li>
+      <li>ApplicationDisplayVersion (MAUI)</li>
+      <li>ApplicationVersion (MAUI)</li>
+      <li>VersionPrefix</li>
+      <li>More comming soon...</li>
+   </ul>
+   <p>It will work with at least the following project types</p>
+   <ul>
+      <li>Full .Net projects (C# and VB.Net) Class library, Web, WPF, UWP etc </li>
+      <li>.Net Core and .NET 5.x+</li>
+      <li>.Net standard </li>
+      <li>PCL </li>
+   </ul>
+   <p>Version control is available from the tools menu - Tools &gt; Version Changer </p>
+   <p>Please note that this project is now Open Source and you can contribute at -> <a
+         href="https://github.com/newky2k/VersionChangerAddin">https://github.com/newky2k/VersionChangerAddin</a>
+   <h3>Visual Studio 2019 version of the extension can be found <a
+         href="https://marketplace.visualstudio.com/items?itemName=Newky2k.VersionChanger">here</a></h3>
+   </p>
+   <p>It will remain open-source and free and the only visible change is a small Copidal button in the corner.</p>
+   <h3>Links</h3>
+   <ul>
+      <li><a href="https://github.com/newky2k/VersionChangerAddin">View Source code</a></li>
+      <li><a href="https://github.com/newky2k/VersionChangerAddin/issues">Log an issue or suggest a feature</a></li>
+   </ul>
+   <h2>Release Notes</h2>
+   <ul>
+      <li>
+         Version 4.0.0
+         <ul>
+            <li>ARM64 support for Visual Studio on Windows Arm (2022 and above)</li>
+            <li>Dark mode support
+               <ul>
+                  <li>It automatically matches Visual Studio(light or dark mode only, not blue which is light)</li>
+               </ul>
+            </li>
+            <li>Added support for MAUI version numbers
+               <ul>
+                  <li>Can update ApplicationDisplayVersion and ApplicationVersion</li>
+               </ul>
+            </li>
+            <li>Added support for VersionPrefix</li>
+            <li>Updated the UI and split the "Options" into a new tab with more options for updating specific version
+               properties</li>
+            <li>Updated to new version of MahApps</li>
+            <li>Changed branding</li>
+            <li>Improvements to version calculations</li>
+         </ul>
+      </li>
+      <li>
+         Version 3.3.0
+         <ul>
+            <li>Fixed binding issues with the File Version when using separate version numbers</li>
+            <li>Updates to the loading of projects so that the window is shown immediately and the loading progress can
+               be seen</li>
+            <li>Fixed layout of the IOS and Android version fields</li>
+            <li>Tweaked the design of the panels to separate the projects list and the options panel</li>
+         </ul>
+      </li>
+      <li>
+         Version 3.2.0
+         <ul>
+            <li>Fixed issues with not updating VB.NET projects</li>
+            <li>Fixed issues with not updating &lt;PackageVersion&gt;</li>
+            <li>Updated version logic for suffixes (if you include a + or - it will not attach an - at the begining)
+            </li>
+            <li>Code cleanup</li>
+            <li>Changed theme</li>
+            <li>Add some branding for Copidal (a company that i've setup)</li>
+         </ul>
+      </li>
+      <li>
+         Version 3.1.0
+         <ul>
+            <li>Added support for UWP package.appxmanifest files</li>
+            <li>Improved support for Xamarin.Forms shared projects</li>
+            <li>Added support for InformationalVersion in SDK style projects</li>
+            <li>Fixed issues with AssemblyInformationalVersion in .NET Framework projects</li>
+            <li>Minor UI changes</li>
+         </ul>
+      </li>
+      <li>
+         Version 3.0.0
+         <ul>
+            <li>Updated to work with Visual Studio 2022</li>
+            <li>Included support for SemVer version suffix</li>
+         </ul>
+      </li>
+   </ul>
+</body>
+
+</html>

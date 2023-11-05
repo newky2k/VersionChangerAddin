@@ -60,6 +60,7 @@
     <Compile Include="Converters\VersionToStringConverter.cs" />
     <Compile Include="Data\AndroidAppVersion.cs" />
     <Compile Include="Data\AppVersion.cs" />
+    <Compile Include="Data\AssemblyVersionOptions.cs" />
     <Compile Include="Data\CocoaAppVersion.cs" />
     <Compile Include="Data\Enum\FailureReason.cs" />
     <Compile Include="Data\FailedProject.cs" />
@@ -83,6 +84,7 @@
     <Compile Include="Enums\AppType.cs" />
     <Compile Include="Enums\plistType.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
+    <Compile Include="Extensions\VersionExtensions.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Guids.cs" />
     <Compile Include="Helpers\VersionHelper.cs" />
@@ -112,6 +114,9 @@
     <Content Include="Resources\Images.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Resource Include="Resources\LoDaTek.png" />
+    <Content Include="Resources\MarketplaceText.html" />
+    <Content Include="Resources\MarketplaceText_2022.html" />
     <Content Include="Resources\Package.ico">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
@@ -146,13 +151,13 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="MahApps.Metro">
-      <Version>1.6.5</Version>
+      <Version>2.4.10</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.SDK">
-      <Version>17.0.32112.339</Version>
+      <Version>17.7.37357</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.VSSDK.BuildTools">
-      <Version>17.0.5234</Version>
+      <Version>17.7.2196</Version>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>

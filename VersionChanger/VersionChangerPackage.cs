@@ -74,7 +74,6 @@ namespace DSoft.VersionChanger
             {
                 var tsk = Assembly.GetAssembly(typeof(VersionChangerPackage));
 
-
                 var location = Path.GetDirectoryName(tsk.Location);
 
                 var mahApps = Path.Combine(location, "MahApps.Metro.dll");

@@ -428,7 +428,7 @@ namespace DSoft.VersionChanger.Data
                             int locationEnd = remaining.IndexOf("\"");
                             string end = remaining.Substring(locationEnd);
 
-                            var newVersionValue = versionOptions.CalculateVersion(newAssemblyVersion, includeZeroRevision: true);
+                            var newVersionValue = versionOptions.CalculateVersion(newAssemblyVersion);
 
                             var newLine = string.Format("{0}{1}{2}", firstBit, newVersionValue, end);
 
@@ -452,7 +452,7 @@ namespace DSoft.VersionChanger.Data
                             string end = remaining.Substring(locationEnd);
 
 
-                            var newFileVersionValue = versionOptions.CalculateVersion(newFileVersion, includeZeroRevision: true);
+                            var newFileVersionValue = versionOptions.CalculateVersion(newFileVersion);
 
                             var newLine = string.Format("{0}{1}{2}", firstBit, newFileVersionValue.ToString(), end);
 
@@ -476,7 +476,7 @@ namespace DSoft.VersionChanger.Data
                             int locationEnd = remaining.IndexOf("\"");
                             string end = remaining.Substring(locationEnd);
 
-                            var newFileVersionValue = versionOptions.CalculateVersion(newFileVersion, versionSuffix, true);
+                            var newFileVersionValue = versionOptions.CalculateVersion(newFileVersion, versionSuffix);
 
                             var newLine = string.Format("{0}{1}{2}", firstBit, newFileVersionValue.ToString(), end);
 

@@ -1,4 +1,6 @@
-﻿Changes in 4.1.0
+﻿Changes in 4.1.1
+  - Updated .NET Framework processing to respect "Enable Revision"
+Changes in 4.1.0
   - Fixed issue #6 - Enable Revision not being respected in all version calculations
   - Fixed issue with Version Update Option checkboxes not being wired up correctly
   - Added progress bar to 'Update' process so you can see that something is happening

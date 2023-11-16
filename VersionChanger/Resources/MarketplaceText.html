@@ -1,110 +1,228 @@
-<html>
+![VersionChange2019__1.png](VersionChange2019__1.png)
+<p>Version Changer is a Visual Studio extension that makes it simple to change the version numbers of all the projects in a solution.</p>
+<p>Version Changer will detect what type of project it is and update it accordingly, using AssemeblyInfo in old csproj projects for example but &lt;version&gt; in new style csproj projects.</p>
+<p>It can also update Xamarin.Android, Xamarin.iOS projects.&nbsp;</p>
+<p>Version changer can update the following values:</p>
+<ul>
+    <li>Version (AssemblyVersion)</li>
+    <li>File Version (AsemblyFileVersion)</li>
+    <li>InformationalVersion (AssemblyInformationalVersion)</li>
+    <li>PackageVersion</li>
+    <li>Click once version </li>
+    <li>Android manifiest versions </li>
+    <li>iOS and Mac info.plist versions</li>
+    <li>package.appxmanifest versions</li>
+    <li>More comming soon...</li>
+</ul>
+<p>It will work with at least the following project types</p>
+<ul>
+    <li>Full .Net projects (C# and VB.Net) Class library, Web, WPF, UWP etc </li>
+    <li>.Net Core and .NET 5.x+</li>
+    <li>.Net standard </li>
+    <li>PCL </li>
+</ul>
+<p>Version control is available from the tools menu - Tools &gt; Version Changer </p>
+<p>
+    Please note that this project is now Open Source and you can contribute at -> <a href="https://github.com/newky2k/VersionChangerAddin">https://github.com/newky2k/VersionChangerAddin</a>
+    <h3>Visual Studio 2022 version of the extension can be found <a href="https://marketplace.visualstudio.com/items?itemName=Newky2k.VersionChanger2022">here</a></h3>
+</p>
 
-<body>
-   ![VersionChanger2022__1.PNG](VersionChanger2022__1.PNG)
-   <p>Version Changer is a Visual Studio extension that makes it simple to change the version numbers of all the
-      projects in a solution.</p>
-   <p>Version Changer will detect what type of project it is and update it accordingly, using AssemeblyInfo in old
-      csproj projects for example but &lt;version&gt; in new style csproj projects.</p>
-   <p>It can also update Xamarin.Android, Xamarin.iOS projects.&nbsp;</p>
-   <p>Version changer can update the following values:</p>
-   <ul>
-      <li>Version (AssemblyVersion)</li>
-      <li>File Version (AsemblyFileVersion)</li>
-      <li>InformationalVersion (AssemblyInformationalVersion)</li>
-      <li>PackageVersion</li>
-      <li>Click once version </li>
-      <li>Android manifiest versions </li>
-      <li>iOS and Mac info.plist versions</li>
-      <li>package.appxmanifest versions</li>
-      <li>ApplicationDisplayVersion (MAUI)</li>
-      <li>ApplicationVersion (MAUI)</li>
-      <li>VersionPrefix</li>
-      <li>More comming soon...</li>
-   </ul>
-   <p>It will work with at least the following project types</p>
-   <ul>
-      <li>Full .Net projects (C# and VB.Net) Class library, Web, WPF, UWP etc </li>
-      <li>.Net Core and .NET 5.x+</li>
-      <li>.Net standard </li>
-      <li>PCL </li>
-   </ul>
-   <p>Version control is available from the tools menu - Tools &gt; Version Changer </p>
-   <p>Please note that this project is now Open Source and you can contribute at -> <a
-         href="https://github.com/newky2k/VersionChangerAddin">https://github.com/newky2k/VersionChangerAddin</a>
-   <h3>Visual Studio 2019 version of the extension can be found <a
-         href="https://marketplace.visualstudio.com/items?itemName=Newky2k.VersionChanger">here</a></h3>
-   </p>
-   <p>It will remain open-source and free and the only visible change is a small Copidal button in the corner.</p>
-   <h3>Links</h3>
-   <ul>
-      <li><a href="https://github.com/newky2k/VersionChangerAddin">View Source code</a></li>
-      <li><a href="https://github.com/newky2k/VersionChangerAddin/issues">Log an issue or suggest a feature</a></li>
-   </ul>
-   <h2>Release Notes</h2>
-   <ul>
-      <li>
-         Version 4.0.0
-         <ul>
-            <li>ARM64 support for Visual Studio on Windows Arm (2022 and above)</li>
-            <li>Dark mode support
-               <ul>
-                  <li>It automatically matches Visual Studio(light or dark mode only, not blue which is light)</li>
-               </ul>
-            </li>
-            <li>Added support for MAUI version numbers
-               <ul>
-                  <li>Can update ApplicationDisplayVersion and ApplicationVersion</li>
-               </ul>
-            </li>
-            <li>Added support for VersionPrefix</li>
-            <li>Updated the UI and split the "Options" into a new tab with more options for updating specific version
-               properties</li>
-            <li>Updated to new version of MahApps</li>
-            <li>Changed branding</li>
-            <li>Improvements to version calculations</li>
-         </ul>
-      </li>
-      <li>
-         Version 3.3.0
-         <ul>
+<h3>What is Copidal?</h3>
+Copidal is a company that I’ve set up with a few other people, to help grow and build on the work I’ve been doing privately.
+This means I can spend more time on my open-source projects and provide better support, faster turn-around of bug fixes and new features. It also means I can build some commercial products too, such as <a href="https://www.copidal.com/products/rainyday-backup/">RainyDay Backup</a>.
+
+<h3>What does this mean for “Version Changer”?</h3>
+<div>Only good things.  It means I’ll have more time to work it, fix bugs and add new features.  It also means I can work to update the Mac version of the extension and bring it inline feature wise as well as possibly extending it to VS Code and DevOps. We can also spend more time on testing and documentation. </div>
+<p>It will remain open-source and free and the only visible change is a small Copidal button in the corner.</p>
+
+<h3>Links</h3>
+<ul>
+    <li><a href="https://github.com/newky2k/VersionChangerAddin">View Source code</a></li>
+    <li><a href="https://github.com/newky2k/VersionChangerAddin/issues">Log an issue or suggest a feature</a></li>
+    <li><a href="https://www.copidal.com">Copidal Home page</a></li>
+</ul>
+
+<h2>Release Notes</h2>
+<ul>
+    <li>
+        Version 2.3.5
+        <ul>
             <li>Fixed binding issues with the File Version when using separate version numbers</li>
-            <li>Updates to the loading of projects so that the window is shown immediately and the loading progress can
-               be seen</li>
+            <li>Updates to the loading of projects so that the window is shown immediately and the loading progress can be seen</li>
             <li>Fixed layout of the IOS and Android version fields</li>
             <li>Tweaked the design of the panels to separate the projects list and the options panel</li>
-         </ul>
-      </li>
-      <li>
-         Version 3.2.0
-         <ul>
+        </ul>
+    </li>
+    <li>
+        Version 2.3.4
+        <ul>
             <li>Fixed issues with not updating VB.NET projects</li>
-            <li>Fixed issues with not updating &lt;PackageVersion&gt;</li>
-            <li>Updated version logic for suffixes (if you include a + or - it will not attach an - at the begining)
-            </li>
+            <li>Fixed issues with not Updating &lt;PackageVersion&gt;</li>
+            <li>Updated version logic for suffixes(if you include a + or - it will not attached an - at the begining)</li>
             <li>Code cleanup</li>
             <li>Changed theme</li>
-            <li>Add some branding for Copidal (a company that i've setup)</li>
-         </ul>
-      </li>
-      <li>
-         Version 3.1.0
-         <ul>
-            <li>Added support for UWP package.appxmanifest files</li>
-            <li>Improved support for Xamarin.Forms shared projects</li>
-            <li>Added support for InformationalVersion in SDK style projects</li>
-            <li>Fixed issues with AssemblyInformationalVersion in .NET Framework projects</li>
+            <li>Add some branding for Copidal(a company that i've setup)</li>
+        </ul>
+    </li>
+    <li>
+        Version 2.3.3
+        <ul>
+            <li>Added support for UWP appxmanifest updates</li>
+            <li>Fixed issues with AssemblyInformationalVersion not being updated</li>
+            <li>Enhanced support for Xamarin.Forms shared projects</li>
             <li>Minor UI changes</li>
-         </ul>
-      </li>
-      <li>
-         Version 3.0.0
-         <ul>
-            <li>Updated to work with Visual Studio 2022</li>
             <li>Included support for SemVer version suffix</li>
-         </ul>
-      </li>
-   </ul>
-</body>
-
-</html>
+        </ul>
+    </li>
+    <li>
+        Version 2.3.2
+        <ul>
+            <li>Fixed packaging issues</li>
+        </ul>
+    </li>
+    <li>
+        Version 2.3.1
+        <ul>
+            <li>Fixed crashes when processing Sandcastle Help File Builder projects - Now ignores them</li>
+            <li>Added null check to the ProjectItems count</li>
+            <li>Added notification if there are no compatible projects found</li>
+        </ul>
+    </li>
+    <li>
+        Version 2.3
+        <ul>
+            <li>Fixed issues with the loading of the projects</li>
+            <li>Fixed binding on the Seperate Versions checkbox</li>
+        </ul>
+    </li>
+    <li>
+        Version 2.2
+        <ul>
+            <li>Added filtering to the project list - Thanks to Carlos Chourio</li>
+            <li>Fixed issues with processing AssemblyInfo.cs where there were gaps</li>
+            <li>Fixed issue with processing Android projects without manifest.xml files</li>
+        </ul>
+    </li>
+    <li>
+        Version 2.1
+        <ul>
+            <li>Improved detection of unloaded projects, to reduce false positives</li>
+            <li>Fixed hanging issue when nodes are missing from the AssemblyInfo.cs file within a project</li>
+            <li>
+                Added warning Notice when projects can be loaded
+                <ul>
+                    <li>You can also see the projects and errors</li>
+                </ul>
+            </li>
+            <li>Improved look and feel of the notification banner</li>
+        </ul>
+    </li>
+    <li>
+        Version 2.0.1
+        <ul>
+            <li>Fixed layout issues with the data grid when there are a large number of projects</li>
+        </ul>
+    </li>
+    <li>
+        Version 2.0
+        <ul>
+            <li>Updated for Visual Studio 2019</li>
+            <li>Updated .Net Dependencies</li>
+            <li>Fixed bug with unloaded projects causing visual studio to crash</li>
+            <li>Added support for SemVer version numbers(not pre-release)</li>
+            <li>Converted into individual number fields for Assembly and Assembly File Versions</li>
+            <li>Improved support of Nuget packages in new style csproj files</li>
+            <li>Supports newstyle csproj files and AssemblyInfo.cs files(will process as old style project) </li>
+        </ul>
+    </li>
+    <li>
+        Version 1.8
+        <ul>
+            <li>
+                Improved UI
+                <ul>
+                    <li>Cleaned up the UI </li>
+                    <li>Switched to a DataGrid for the projects listing </li>
+                    <li>Removed the Context Menu as it wasn't wired up anyway </li>
+                    <li>Added Select/Unselect All </li>
+                </ul>
+            </li>
+            <li>Fixes for cases where the Version line is the last line of the AssemblyInfo file </li>
+        </ul>
+    </li>
+    <li>
+        Version 1.7.2
+        <ul>
+            <li>Changed to ignore Wix Setup projects entirely </li>
+        </ul>
+    </li>
+    <li>
+        Version 1.7.1.0
+        <ul>
+            <li>Fixed issue with processing the assemblyinfo file in some circumstances </li>
+        </ul>
+    </li>
+    <li>
+        Verison 1.7
+        <ul>
+            <li>Added support for Visual 2017 All Editions </li>
+            <li>Added support for new style .csproj, where there is no AssemeblyInfo file </li>
+            <li>Added support for Xamarin.iOS(info.plist) and Xamarin.Android(androidmanifest.xml) version updates </li>
+            <li>Cleaned up UI a little </li>
+        </ul>
+    </li>
+    <li>
+        Version 1.6.2
+        <ul>
+            <li>Update for VS2015 </li>
+        </ul>
+    </li>
+    <li>
+        Version 1.6.1
+        <ul>
+            <li>Update to install on Windows 10 </li>
+        </ul>
+    </li>
+    <li>
+        Version 1.6
+        <ul>
+            <li>Fixed issue with blank projects list </li>
+        </ul>
+    </li>
+    <li>
+        Version 1.5
+        <ul>
+            <li>Updated to ignore Visual Studio Installer projects </li>
+        </ul>
+    </li>
+    <li>
+        Version 1.4
+        <ul>
+            <li>Updated to modify files using the Visual Studio SDK,instead for direct file access </li>
+        </ul>
+    </li>
+    <li>
+        Version 1.3
+        <ul>
+            <li>Added support for ClickOnce version updates </li>
+        </ul>
+    </li>
+    <li>
+        Version 1.2
+        <ul>
+            <li>Fixed a crash if there were Installer Projects in the soltuion </li>
+        </ul>
+    </li>
+    <li>
+        Version 1.1
+        <ul>
+            <li>Added ability to use different version numbers for Assembly and File versions </li>
+        </ul>
+    </li>
+    <li>
+        Version 1.0
+        <ul>
+            <li>Initial Release<strong>&nbsp;</strong> </li>
+        </ul>
+    </li>
+</ul>

@@ -3,7 +3,7 @@
         xmlns:vsUI="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.15.0"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:data="clr-namespace:DSoft.VersionChanger.Data" 
-        Title="Version Changer 2022"  Height="720" Width="800" ResizeMode="NoResize" WindowStartupLocation="CenterOwner" ShowInTaskbar="False" Loaded="OnLoaded">
+        Title="Version Changer"  Height="720" Width="800" ResizeMode="NoResize" WindowStartupLocation="CenterOwner" ShowInTaskbar="False" Loaded="OnLoaded">
     <WindowChrome.WindowChrome>
         <WindowChrome CaptionHeight="34" />
     </WindowChrome.WindowChrome>
@@ -26,7 +26,7 @@
         <Grid Grid.Row="0" Height="30" Background="{StaticResource MahApps.Brushes.Accent}">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center">
                 <!--App icon-->
-                <TextBlock Text="Version Changer 2022" FontFamily="Arial" Margin="10 3 0 0" Foreground="White"/>
+                <TextBlock Text="Version Changer" FontFamily="Arial" Margin="10 3 0 0" Foreground="White"/>
             </StackPanel>
 
             <!--Caption buttons-->

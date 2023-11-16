@@ -83,7 +83,7 @@ namespace DSoft.VersionChanger.Views
             _viewModel.IsBusy = true;
 
 #pragma warning disable VSTHRD110 // Observe result of async calls
-            Task.Run(() =>
+            System.Threading.Tasks.Task.Run(() =>
             {
                 ThreadHelper.JoinableTaskFactory.Run(async delegate {
                     await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
@@ -122,7 +122,7 @@ namespace DSoft.VersionChanger.Views
             _viewModel.IsBusy = true;
 
 #pragma warning disable VSTHRD110 // Observe result of async calls
-            Task.Run(() =>
+            System.Threading.Tasks.Task.Run(() =>
             {
                 ThreadHelper.JoinableTaskFactory.Run(async delegate {
                     await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();

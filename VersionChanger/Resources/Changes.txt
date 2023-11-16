@@ -1,4 +1,9 @@
-﻿Changes in 4,0.0
+﻿Changes in 4.1.0
+  - Fixed issue #6 - Enable Revision not being respected in all version calculations
+  - Fixed issue with Version Update Option checkboxes not being wired up correctly
+  - Added progress bar to 'Update' process so you can see that something is happening
+
+Changes in 4.1.0
   - ARM64 support for Visual Studio on Windows Arm (2022 and above)
   - Dark mode support. 
 	- It automatically matches Visual Studio(light or dark mode only, not blue which is light)

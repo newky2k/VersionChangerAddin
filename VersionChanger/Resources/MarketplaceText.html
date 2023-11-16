@@ -1,4 +1,4 @@
-![VersionChange2019__1.png](VersionChange2019__1.png)
+![VersionChanger2019.png](VersionChanger2019.png)
 <p>Version Changer is a Visual Studio extension that makes it simple to change the version numbers of all the projects in a solution.</p>
 <p>Version Changer will detect what type of project it is and update it accordingly, using AssemeblyInfo in old csproj projects for example but &lt;version&gt; in new style csproj projects.</p>
 <p>It can also update Xamarin.Android, Xamarin.iOS projects.&nbsp;</p>
@@ -27,23 +27,52 @@
     <h3>Visual Studio 2022 version of the extension can be found <a href="https://marketplace.visualstudio.com/items?itemName=Newky2k.VersionChanger2022">here</a></h3>
 </p>
 
-<h3>What is Copidal?</h3>
-Copidal is a company that I’ve set up with a few other people, to help grow and build on the work I’ve been doing privately.
-This means I can spend more time on my open-source projects and provide better support, faster turn-around of bug fixes and new features. It also means I can build some commercial products too, such as <a href="https://www.copidal.com/products/rainyday-backup/">RainyDay Backup</a>.
-
-<h3>What does this mean for “Version Changer”?</h3>
-<div>Only good things.  It means I’ll have more time to work it, fix bugs and add new features.  It also means I can work to update the Mac version of the extension and bring it inline feature wise as well as possibly extending it to VS Code and DevOps. We can also spend more time on testing and documentation. </div>
-<p>It will remain open-source and free and the only visible change is a small Copidal button in the corner.</p>
-
-<h3>Links</h3>
 <ul>
     <li><a href="https://github.com/newky2k/VersionChangerAddin">View Source code</a></li>
     <li><a href="https://github.com/newky2k/VersionChangerAddin/issues">Log an issue or suggest a feature</a></li>
-    <li><a href="https://www.copidal.com">Copidal Home page</a></li>
 </ul>
 
 <h2>Release Notes</h2>
 <ul>
+    <li>
+        Version 4.1.1
+        <ul>
+            <li>Updated .NET Framework processing to respect "Enable Revision" in version calculations</li>
+        </ul>
+    </li>
+    <li>
+        Version 4.1.0
+        <ul>
+            <li>Fixed issue #6 - Enable Revision not being respected in all version calculations</li>
+            <li>Fixed issue with Version Update Option checkboxes not being wired up correctly</li>
+            <li>Added progress bar to 'Update' process so you can see that something is happening</li>
+        </ul>
+    </li>
+    <li>
+        Version 4.0.0
+        <ul>
+            <li>
+                Dark mode support
+                <ul>
+                    <li>It automatically matches Visual Studio(light or dark mode only, not blue which is light)</li>
+                </ul>
+            </li>
+            <li>
+                Added support for MAUI version numbers
+                <ul>
+                    <li>Can update ApplicationDisplayVersion and ApplicationVersion</li>
+                </ul>
+            </li>
+            <li>Added support for VersionPrefix</li>
+            <li>
+                Updated the UI and split the "Options" into a new tab with more options for updating specific version
+                properties
+            </li>
+            <li>Updated to new version of MahApps</li>
+            <li>Changed branding</li>
+            <li>Improvements to version calculations</li>
+        </ul>
+    </li>
     <li>
         Version 2.3.5
         <ul>

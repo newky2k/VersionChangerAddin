@@ -1,13 +1,12 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
     <Metadata>
-        <Identity Id="VersionChanger.315c8ff9-932e-4b23-b9d8-0fcd23bdb0be" Version="3.9.9" Language="en-US" Publisher="DSoft Developments" />
+        <Identity Id="VersionChanger.315c8ff9-932e-4b23-b9d8-0fcd23bdb0be" Version="4.1.1" Language="en-US" Publisher="DSoft Developments" />
         <DisplayName>Version Changer</DisplayName>
         <Description xml:space="preserve">Visual Studio extension that allows you to change the version number of all projects in a solution in a easy to use interface.</Description>
         <MoreInfo>https://visualstudiogallery.msdn.microsoft.com/554c35ef-fe76-4138-b60e-a44b72ade70e</MoreInfo>
-        <ReleaseNotes>Changes.txt</ReleaseNotes>
+        <ReleaseNotes>Resources\Changes2019.txt</ReleaseNotes>
         <Icon>Resources\Package.ico</Icon>
-        <Preview>true</Preview>
     </Metadata>
     <Installation>
         <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[15.0, 17.0)" />

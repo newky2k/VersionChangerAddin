@@ -1,0 +1,63 @@
+﻿Changes in 4.1.1
+  - Updated .NET Framework processing to respect "Enable Revision"
+Changes in 4.1.0
+  - Fixed issue #6 - Enable Revision not being respected in all version calculations
+  - Fixed issue with Version Update Option checkboxes not being wired up correctly
+  - Added progress bar to 'Update' process so you can see that something is happening
+
+Changes in 4.0.0
+  - ARM64 support for Visual Studio on Windows Arm (2022 and above)
+  - Dark mode support. 
+	- It automatically matches Visual Studio(light or dark mode only, not blue which is light)
+  - Added support for MAUI version numbers
+	- Can update ApplicationDisplayVersion and ApplicationVersion
+  - Added support for VersionPrefix
+  - Updated the UI and split the "Options" into a new tab with more options for updating specific version properties
+  - Updated to new version of MahApps
+  - Changed branding
+  - Improvements to version calculations
+
+Changes in 2.3.5
+  - Fixed binding issues with the File Version when using seperate version numbers
+  - Updates to the loading of projects so that the window is shown immediately and the loading progress can be seen
+  - Fixed layout of the IOS and Android version fields
+  - Tweaked the design of the panels to seperate the projects list and the options panel
+
+Changes in 2.3.4
+  - Fixed issues with not updating VB.NET projects
+  - Fixed issues with not Updating <PackageVersion>
+  - Updated version logic for suffixes(if you include a + or - it will not attached a - at the begining)
+  - Code cleanup
+  - Changed theme
+  - Add some branding for Copidal(a company that i've setup)
+
+Changes in 2.3.3
+  - Added support for UWP appxmanifest updates
+  - fixed issues with AssemblyInformationalVersion not being updated
+  - Enhanced support for Xamarin.Forms shared projects
+  - Minor UI changes
+  - Included support for SemVer version suffix
+
+Changes in 2.3.2
+  - Fixed packaging issues
+
+Changes in 2.3.1
+ - Fixed crashes when processing Sandcastle Help File Builder projects - Now ignores them
+ - Added null check to the ProjectItems count
+ - Added notification if there are no compatible projects found
+
+Changes in 2.3.0
+ - Fixed issues with the loading of the projects
+ - Fixed binding on the SeperateVersions checkbox
+
+Changes in 2.2.0
+ - Fixed issues with processing AssemblyInfo.cs where there were gaps
+ - Fixed issue with processing Android projects without manifest.xml files
+
+Changes in 2.0.2
+
+- Improved detection of unloaded projects, to reduce false positives
+- Fixed hanging issue when nodes are missing from the AssemblyInfo.cs file within a project
+- Added warning Notice when projects can be loaded
+  - You can also see the projects and errors
+- Improved look and feel of the notifcation banner

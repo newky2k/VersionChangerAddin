@@ -1,5 +1,4 @@
 ﻿using DSoft.VersionChanger.Extensions;
-using DSoft.VersionChanger.Helpers;
 using EnvDTE;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Flavor;
@@ -22,14 +21,18 @@ namespace DSoft.VersionChanger.Data
     /// </summary>
     public class SolutionProcessor : IDisposable
     {
+        #region Fields
+        private List<FailedProject> _failedProjects;
+        private Solution _mainSolution;
+        #endregion
+
+        #region Properties
 
         public event EventHandler<int> OnLoadedProjects = delegate { };
 
         public event EventHandler<Tuple<int, string>> OnStartingProject = delegate { };
 
         public bool DetectedUnloadedProjects { get; set; }
-
-        private List<FailedProject> _failedProjects;
 
         public List<FailedProject> FailedProjects
         {
@@ -43,12 +46,20 @@ namespace DSoft.VersionChanger.Data
             set { _failedProjects = value; }
         }
 
-        private Solution _mainSolution;
+        #endregion
+
+        #region Constructors
 
         public SolutionProcessor(Solution MainSolution)
         {
             _mainSolution = MainSolution;
         }
+
+
+        #endregion
+
+        #region Public Methods
+
 
         /// <summary>
         /// Builds the versions from the projects
@@ -180,7 +191,7 @@ namespace DSoft.VersionChanger.Data
         /// <param name="newVersion"></param>
         /// <param name="fileVersion"></param>
         /// <param name="versionSuffix"></param>
-        internal void UpdateSdkProject(Project realProject, AssemblyVersionOptions versionOptions, Version newVersion, Version fileVersion = null, string versionSuffix = null)
+        public void UpdateSdkProject(Project realProject, AssemblyVersionOptions versionOptions, Version newVersion, Version fileVersion = null, string versionSuffix = null)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
@@ -260,7 +271,7 @@ namespace DSoft.VersionChanger.Data
                         {
                             newLine = newLine.Substring(0, pos + (infoVersion.Length + 2));
 
-                            newLine += VersionHelper.CalculateVersion(newVersion, versionSuffix);
+                            newLine += versionOptions.CalculateVersion(newVersion, versionSuffix);
 
                             newLine += $"</{infoVersion}>";
 
@@ -278,7 +289,7 @@ namespace DSoft.VersionChanger.Data
                         {
                             newLine = newLine.Substring(0, pos + (packVer.Length + 2));
 
-                            newLine += VersionHelper.CalculateVersion(newVersion, versionSuffix);
+                            newLine += versionOptions.CalculateVersion(newVersion, versionSuffix);
 
                             newLine += $"</{packVer}>";
 
@@ -296,7 +307,7 @@ namespace DSoft.VersionChanger.Data
                         {
                             newLine = newLine.Substring(0, pos + (mauiDisplayVersion.Length + 2));
 
-                            newLine += VersionHelper.CalculateVersion(newVersion);
+                            newLine += versionOptions.CalculateVersion(newVersion);
 
                             newLine += $"</{mauiDisplayVersion}>";
 
@@ -332,7 +343,7 @@ namespace DSoft.VersionChanger.Data
                         {
                             newLine = newLine.Substring(0, pos + (verPrefix.Length + 2));
 
-                            newLine += VersionHelper.CalculateVersion(newVersion);
+                            newLine += versionOptions.CalculateVersion(newVersion);
 
                             newLine += $"</{verPrefix}>";
 
@@ -417,7 +428,7 @@ namespace DSoft.VersionChanger.Data
                             int locationEnd = remaining.IndexOf("\"");
                             string end = remaining.Substring(locationEnd);
 
-                            var newVersionValue = VersionHelper.CalculateVersion(newAssemblyVersion, includeZeroRevision: true);
+                            var newVersionValue = versionOptions.CalculateVersion(newAssemblyVersion, includeZeroRevision: true);
 
                             var newLine = string.Format("{0}{1}{2}", firstBit, newVersionValue, end);
 
@@ -441,7 +452,7 @@ namespace DSoft.VersionChanger.Data
                             string end = remaining.Substring(locationEnd);
 
 
-                            var newFileVersionValue = VersionHelper.CalculateVersion(newFileVersion, includeZeroRevision: true);
+                            var newFileVersionValue = versionOptions.CalculateVersion(newFileVersion, includeZeroRevision: true);
 
                             var newLine = string.Format("{0}{1}{2}", firstBit, newFileVersionValue.ToString(), end);
 
@@ -465,7 +476,7 @@ namespace DSoft.VersionChanger.Data
                             int locationEnd = remaining.IndexOf("\"");
                             string end = remaining.Substring(locationEnd);
 
-                            var newFileVersionValue = VersionHelper.CalculateVersion(newFileVersion, versionSuffix, true);
+                            var newFileVersionValue = versionOptions.CalculateVersion(newFileVersion, versionSuffix, true);
 
                             var newLine = string.Format("{0}{1}{2}", firstBit, newFileVersionValue.ToString(), end);
 
@@ -497,6 +508,15 @@ namespace DSoft.VersionChanger.Data
             
             
         }
+
+        public void Dispose()
+        {
+            _mainSolution = null;
+        }
+
+        #endregion
+
+        #region Private Methods
 
         /// <summary>
         /// Finds the projects in the solution
@@ -612,7 +632,7 @@ namespace DSoft.VersionChanger.Data
             return null;
         }
 
-        public string[] GetProjectTypeGuids(EnvDTE.Project proj)
+        private string[] GetProjectTypeGuids(EnvDTE.Project proj)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
@@ -647,14 +667,14 @@ namespace DSoft.VersionChanger.Data
 
         }
 
-        public object GetService(object serviceProvider, Type type)
+        private object GetService(object serviceProvider, Type type)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
             return GetService(serviceProvider, type.GUID);
         }
 
-        public object GetService(object serviceProviderObject, System.Guid guid)
+        private object GetService(object serviceProviderObject, System.Guid guid)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
@@ -1097,9 +1117,8 @@ namespace DSoft.VersionChanger.Data
             return newVersion;
         }
 
-        public void Dispose()
-        {
-            _mainSolution = null;
-        }
+        #endregion
+
+ 
     }
 }

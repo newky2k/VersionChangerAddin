@@ -277,9 +277,9 @@
                                         <CheckBox Margin="5,5,0,5" Content="Version" Width="150" IsChecked="{Binding UpdateVersion}" ToolTip="Update Version property"/>
                                         <CheckBox Margin="5,5,0,5" Content="AssemblyVersion" Width="150" IsChecked="{Binding UpdateAssemblyVersion}" ToolTip="Update AssemblyVersion property"/>
                                         <CheckBox Margin="5,5,0,5" Content="VersionPrefix" Width="170" IsChecked="{Binding UpdateVersionPrefix}" ToolTip="Update VersionPrefix property (SDK-style only)"/>
-                                        <CheckBox Margin="5,5,0,5" Content="FileVersion" Width="150" IsChecked="{Binding UpdateVersionPrefix}" ToolTip="Update FileVersion (SDK-style) or AssemblyFileVersion (.NET Framework) properties"/>
-                                        <CheckBox Margin="5,5,0,5" Content="PackageVersion" Width="150" IsChecked="{Binding UpdateAssemblyVersion}" ToolTip="Update PackageVersion  (SDK-style only)"/>
-                                        <CheckBox Margin="5,5,0,5" Content="InformationalVersion" Width="150" IsChecked="{Binding UpdateVersionPrefix}" ToolTip="Update InformationalVersion and AssemblyInformationalVersion properties"/>
+                                        <CheckBox Margin="5,5,0,5" Content="FileVersion" Width="150" IsChecked="{Binding UpdateFileVersion}" ToolTip="Update FileVersion (SDK-style) or AssemblyFileVersion (.NET Framework) properties"/>
+                                        <CheckBox Margin="5,5,0,5" Content="PackageVersion" Width="150" IsChecked="{Binding UpdatePackageVersion}" ToolTip="Update PackageVersion  (SDK-style only)"/>
+                                        <CheckBox Margin="5,5,0,5" Content="InformationalVersion" Width="150" IsChecked="{Binding UpdateInformationalVersion}" ToolTip="Update InformationalVersion and AssemblyInformationalVersion properties"/>
                                         <CheckBox Margin="5,5,0,5" Content="ApplicationDisplayVersion" Width="170" IsChecked="{Binding UpdateAppDisplayVersion}" ToolTip="Update ApplicationDisplayVersion property for MAUI projects"/>
                                         <CheckBox Margin="5,5,0,5" Content="ApplicationVersion" Width="150" IsChecked="{Binding UpdateAppVersion}" ToolTip="Update ApplicationVersion property for MAUI projects"/>
                                     </WrapPanel>

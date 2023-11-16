@@ -80,18 +80,31 @@ namespace DSoft.VersionChanger.Views
 
         private void OnBeginClicked(object sender, RoutedEventArgs e)
         {
-            ThreadHelper.ThrowIfNotOnUIThread();
+            _viewModel.IsBusy = true;
 
-            try
+#pragma warning disable VSTHRD110 // Observe result of async calls
+            Task.Run(() =>
             {
-                _viewModel.ProcessUpdates();
+                ThreadHelper.JoinableTaskFactory.Run(async delegate {
+                    await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
-                this.DialogResult = true;
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message, "Version Changer");
-            }
+                    try
+                    {
+                        _viewModel.ProcessUpdates();
+
+                        this.DialogResult = true;
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show(ex.Message, "Version Changer");
+                    }
+
+                });
+
+
+            });
+#pragma warning restore VSTHRD110 // Observe result of async calls
+
         }
 
         private void OnPreviewKeyDown(object sender, KeyEventArgs e)
@@ -145,7 +158,7 @@ namespace DSoft.VersionChanger.Views
 
 		private void OnClickLogo(object sender, RoutedEventArgs e)
 		{
-            var url = "https://www.lodatek.com";
+            var url = @"https://github.com/newky2k";
 
             System.Diagnostics.Process.Start(url);
 		}

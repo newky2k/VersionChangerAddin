@@ -668,15 +668,25 @@ namespace DSoft.VersionChanger.ViewModel
 
                 LoadAssFileVersion();
 
-                var stateStream = SettingsControl.GetStreamValue("ProjectState");
 
-                if (stateStream != null && stateStream.Length > 0)
+
+                try
                 {
-                    var dict = stateStream.Deserialize();
+                    var stateStream = SettingsControl.GetStreamValue("ProjectState");
 
-                    Items.UpdateState(dict);
+                    if (stateStream != null && stateStream.Length > 0)
+                    {
+                        var dict = stateStream.Deserialize();
 
+                        Items.UpdateState(dict);
+
+                    }
                 }
+                catch (Exception ex)
+                {
+                    //unable to relaod the project state
+                }
+
                 IsLoaded = true;
                 LoadingProjectsText = "Preparing....";
                 CurrentProjectName = string.Empty;
@@ -891,15 +901,6 @@ namespace DSoft.VersionChanger.ViewModel
                     }
                 }
 
-                //store the selection state of the projects
-                var stateDict = Items.StateDictionary;
-
-                var stream = new MemoryStream();
-
-                stateDict.Serialize(stream);
-
-                SettingsControl.SetStreamValue(stream, "ProjectState");
-
                 IsBusy = false;
             }
             catch (Exception ex)
@@ -966,6 +967,26 @@ namespace DSoft.VersionChanger.ViewModel
         {
             ProjectVersion proj = item as ProjectVersion;
             return string.IsNullOrEmpty(Filter) || proj.Name.CaseContains(Filter,StringComparison.InvariantCultureIgnoreCase);
+        }
+
+        public void SaveProjectSelection()
+        {
+            //store the selection state of the projects
+            var stateDict = Items.StateDictionary;
+
+            try
+            {
+                var stream = new MemoryStream();
+
+                stateDict.Serialize(stream);
+
+                SettingsControl.SetStreamValue(stream, "ProjectState");
+            }
+            catch (Exception)
+            {
+
+                //unable to save the project state
+            }
         }
         #endregion
 

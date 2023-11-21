@@ -1,4 +1,8 @@
-﻿Changes in 4.1.1
+﻿Changes in 4.1.2
+  - Added remembering of the project selection
+  - Fixed issue with file Revision when using separate versions and revision is disabled
+  - Removed support for VS 2017
+Changes in 4.1.1
   - Updated .NET Framework processing to respect "Enable Revision"
 Changes in 4.1.0
   - Fixed issue #6 - Enable Revision not being respected in all version calculations

@@ -7,6 +7,7 @@ using Microsoft.VisualStudio.Shell.Interop;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows.Data;
@@ -115,7 +116,10 @@ namespace DSoft.VersionChanger.ViewModel
 
         public string AssesmblyFileRevision
         {
-            get { return _assemblyFileRevision; }
+            get 
+            { 
+                return _assemblyFileRevision; 
+            }
             set { _assemblyFileRevision = (string.IsNullOrWhiteSpace(value)) ? "0" : value; PropertyDidChange(nameof(AssesmblyFileRevision)); RecalculateFileVersion(); }
         }
 
@@ -612,8 +616,6 @@ namespace DSoft.VersionChanger.ViewModel
 			{
                 ThreadHelper.ThrowIfNotOnUIThread();
 
-                
-
                 using (var solutionProcessor = new SolutionProcessor(_currentSolution))
                 {
 
@@ -666,6 +668,15 @@ namespace DSoft.VersionChanger.ViewModel
 
                 LoadAssFileVersion();
 
+                var stateStream = SettingsControl.GetStreamValue("ProjectState");
+
+                if (stateStream != null && stateStream.Length > 0)
+                {
+                    var dict = stateStream.Deserialize();
+
+                    Items.UpdateState(dict);
+
+                }
                 IsLoaded = true;
                 LoadingProjectsText = "Preparing....";
                 CurrentProjectName = string.Empty;
@@ -728,149 +739,166 @@ namespace DSoft.VersionChanger.ViewModel
                     
                     foreach (ProjectVersion ver in updateableItems)
                     {
-                        LoadingProjectsText = $"Processing {CurrentProject} of {TotalProjects}";
-                        CurrentProjectName = ver.Name;
-                        LoadingProgressUpdated(this, null);
-
-                        if (ver.IsNewStyleProject == true)
-                        {
-                            solutionProcessor.UpdateSdkProject(ver.RealProject, _versionOptions, newVersion, fileVersion, _forceSemVer ? preRelease : null);
-
-                        }
-                        else
-                        {
-                            solutionProcessor.UpdateFrameworkProject(ver.ProjectItem, _versionOptions, newVersion, fileVersion, _forceSemVer ? preRelease : null);
-                        }
-
-
-                        if (UpdateClickOnce)
+                        try
                         {
 
-                            IVsHierarchy hiearachy = null;
-                            _sln.GetProjectOfUniqueName(ver.RealProject.FullName, out hiearachy);
+                            LoadingProjectsText = $"Processing {CurrentProject} of {TotalProjects}";
+                            CurrentProjectName = ver.Name;
+                            LoadingProgressUpdated(this, null);
 
-                            Guid aGuid;
-
-                            _sln.GetGuidOfProject(hiearachy, out aGuid);
-
-                            IVsBuildPropertyStorage buildPropStorage = (IVsBuildPropertyStorage)hiearachy;
-
-                            string propValue;
-                            buildPropStorage.GetPropertyValue("ApplicationVersion", "Debug", (uint)_PersistStorageType.PST_PROJECT_FILE, out propValue);
-
-                            if (!String.IsNullOrWhiteSpace(propValue))
+                            if (ver.IsNewStyleProject == true)
                             {
-                                var xmldoc = XDocument.Load(ver.RealProject.FullName);
+                                solutionProcessor.UpdateSdkProject(ver.RealProject, _versionOptions, newVersion, fileVersion, _forceSemVer ? preRelease : null);
 
-                                XNamespace msbuild = "http://schemas.microsoft.com/developer/msbuild/2003";
+                            }
+                            else
+                            {
+                                solutionProcessor.UpdateFrameworkProject(ver.ProjectItem, _versionOptions, newVersion, fileVersion, _forceSemVer ? preRelease : null);
+                            }
 
-                                bool hasChanged = false;
-                                foreach (var resource in xmldoc.Descendants(msbuild + "ApplicationVersion"))
+
+                            if (UpdateClickOnce)
+                            {
+
+                                IVsHierarchy hiearachy = null;
+                                _sln.GetProjectOfUniqueName(ver.RealProject.FullName, out hiearachy);
+
+                                Guid aGuid;
+
+                                _sln.GetGuidOfProject(hiearachy, out aGuid);
+
+                                IVsBuildPropertyStorage buildPropStorage = (IVsBuildPropertyStorage)hiearachy;
+
+                                string propValue;
+                                buildPropStorage.GetPropertyValue("ApplicationVersion", "Debug", (uint)_PersistStorageType.PST_PROJECT_FILE, out propValue);
+
+                                if (!String.IsNullOrWhiteSpace(propValue))
                                 {
-                                    string curVersion = resource.Value;
+                                    var xmldoc = XDocument.Load(ver.RealProject.FullName);
 
-                                    if (!curVersion.Equals(this.AssemblyVersion))
+                                    XNamespace msbuild = "http://schemas.microsoft.com/developer/msbuild/2003";
+
+                                    bool hasChanged = false;
+                                    foreach (var resource in xmldoc.Descendants(msbuild + "ApplicationVersion"))
                                     {
-                                        resource.Value = newVersionValue;
+                                        string curVersion = resource.Value;
 
-                                        hasChanged = true;
+                                        if (!curVersion.Equals(this.AssemblyVersion))
+                                        {
+                                            resource.Value = newVersionValue;
+
+                                            hasChanged = true;
+                                        }
+
+
+                                    }
+
+                                    if (hasChanged)
+                                    {
+                                        var stP = _application.Solution.Properties.Item("StartupProject").Value;
+
+                                        var stPName = ver.RealProject.Name;
+
+                                        var aFileName = ver.RealProject.FullName;
+
+                                        var _sln2 = (IVsSolution4)_serviceProvider.GetService(typeof(SVsSolution));
+
+                                        if (_sln2 == null)
+                                            throw new Exception("Unable to access the solution");
+
+                                        _sln2.UnloadProject(aGuid, (uint)_VSProjectUnloadStatus.UNLOADSTATUS_UnloadedByUser);
+
+                                        xmldoc.Save(aFileName);
+
+                                        IVsHierarchy hiearachy2 = null;
+                                        _sln.GetProjectOfUniqueName(aFileName, out hiearachy2);
+
+                                        Guid aGuid2;
+
+                                        _sln.GetGuidOfProject(hiearachy2, out aGuid2);
+
+                                        if (aGuid != aGuid2)
+                                            Console.WriteLine("");
+
+                                        _sln2.ReloadProject(aGuid);
+
+                                        if (stP.Equals(stPName))
+                                        {
+                                            _application.Solution.Properties.Item("StartupProject").Value = stPName;
+
+                                        }
+
                                     }
 
 
                                 }
 
-                                if (hasChanged)
+
+
+
+                            }
+
+                            if (ver.SecondaryProjectItem != null)
+                            {
+                                if (ver.IsCocoa == true)
                                 {
-                                    var stP = _application.Solution.Properties.Item("StartupProject").Value;
+                                    var secFile = ver.SecondaryProjectItem.FileNames[0];
 
-                                    var stPName = ver.RealProject.Name;
-
-                                    var aFileName = ver.RealProject.FullName;
-
-                                    var _sln2 = (IVsSolution4)_serviceProvider.GetService(typeof(SVsSolution));
-
-                                    if (_sln2 == null)
-                                        throw new Exception("Unable to access the solution");
-
-                                    _sln2.UnloadProject(aGuid, (uint)_VSProjectUnloadStatus.UNLOADSTATUS_UnloadedByUser);
-
-                                    xmldoc.Save(aFileName);
-
-                                    IVsHierarchy hiearachy2 = null;
-                                    _sln.GetProjectOfUniqueName(aFileName, out hiearachy2);
-
-                                    Guid aGuid2;
-
-                                    _sln.GetGuidOfProject(hiearachy2, out aGuid2);
-
-                                    if (aGuid != aGuid2)
-                                        Console.WriteLine("");
-
-                                    _sln2.ReloadProject(aGuid);
-
-                                    if (stP.Equals(stPName))
+                                    var aUpdater = new CocoaAppVersion()
                                     {
-                                        _application.Solution.Properties.Item("StartupProject").Value = stPName;
+                                        FilePath = secFile
+                                    };
 
-                                    }
+                                    aUpdater.VersionOne = cocoaShortVersion;
+                                    aUpdater.VersionTwo = newVersionValue;
+                                    aUpdater.Update();
 
                                 }
+                                else if (ver.IsAndroid == true)
+                                {
+                                    var secFile = ver.SecondaryProjectItem.FileNames[0];
 
+                                    var aUpdater = new AndroidAppVersion()
+                                    {
+                                        FilePath = secFile
+                                    };
 
+                                    aUpdater.VersionOne = androidBuild;
+                                    aUpdater.VersionTwo = newVersionValue;
+                                    aUpdater.Update();
+                                }
+                                else if (ver.IsUWP == true)
+                                {
+                                    var secFile = ver.SecondaryProjectItem.FileNames[0];
+
+                                    var uwpUpdater = new UWPVersion()
+                                    {
+                                        FilePath = secFile,
+                                    };
+
+                                    uwpUpdater.VersionOne = $"{Version.Parse(newVersionValue).ToString(3)}.0";
+                                    uwpUpdater.Update();
+
+                                }
                             }
 
-
-
-
+                            CurrentProject++;
                         }
-
-                        if (ver.SecondaryProjectItem != null)
+                        catch (Exception ex)
                         {
-                            if (ver.IsCocoa == true)
-                            {
-                                var secFile = ver.SecondaryProjectItem.FileNames[0];
-
-                                var aUpdater = new CocoaAppVersion()
-                                {
-                                    FilePath = secFile
-                                };
-
-                                aUpdater.VersionOne = cocoaShortVersion;
-                                aUpdater.VersionTwo = newVersionValue;
-                                aUpdater.Update();
-
-                            }
-                            else if (ver.IsAndroid == true)
-                            {
-                                var secFile = ver.SecondaryProjectItem.FileNames[0];
-
-                                var aUpdater = new AndroidAppVersion()
-                                {
-                                    FilePath = secFile
-                                };
-
-                                aUpdater.VersionOne = androidBuild;
-                                aUpdater.VersionTwo = newVersionValue;
-                                aUpdater.Update();
-                            }
-                            else if (ver.IsUWP == true)
-                            {
-                                var secFile = ver.SecondaryProjectItem.FileNames[0];
-
-                                var uwpUpdater = new UWPVersion()
-                                {
-                                    FilePath = secFile,
-                                };
-
-                                uwpUpdater.VersionOne = $"{Version.Parse(newVersionValue).ToString(3)}.0";
-                                uwpUpdater.Update();
-
-                            }
+                            throw;
                         }
-
-                        CurrentProject++;
                     }
                 }
+
+                //store the selection state of the projects
+                var stateDict = Items.StateDictionary;
+
+                var stream = new MemoryStream();
+
+                stateDict.Serialize(stream);
+
+                SettingsControl.SetStreamValue(stream, "ProjectState");
 
                 IsBusy = false;
             }
@@ -906,7 +934,7 @@ namespace DSoft.VersionChanger.ViewModel
             AssemblyMajor = assmVersion.Major.ToString();
             AssemblyMinor = assmVersion.Minor.ToString();
             AssemblyBuild = assmVersion.Build.ToString();
-            AssesmblyRevision = assmVersion.Revision.ToString();
+            AssesmblyRevision = (assmVersion.Revision == -1) ? "0" : assmVersion.Revision.ToString();
         }
 
         private void LoadAssFileVersion()
@@ -918,7 +946,7 @@ namespace DSoft.VersionChanger.ViewModel
                 AssemblyFileMajor = assmVersion.Major.ToString();
                 AssemblyFileMinor = assmVersion.Minor.ToString();
                 AssemblyFileBuild = assmVersion.Build.ToString();
-                AssesmblyFileRevision = assmVersion.Revision.ToString();
+                AssesmblyFileRevision = (assmVersion.Revision == -1) ? "0" : assmVersion.Revision.ToString();
             }
             else
             {

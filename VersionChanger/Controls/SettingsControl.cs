@@ -2,6 +2,7 @@
 using Microsoft.VisualStudio.Shell.Interop;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -78,10 +79,34 @@ namespace DSoft.VersionChanger.Controls
             return returnVal;
         }
 
-        public static void SetBooleanValue(bool value, string key)
+        public static MemoryStream GetStreamValue(string key)
         {
-            
+            MemoryStream returnVal = null;
+
+            try
+            {
+                returnVal = SettingsStore.GetMemoryStream("Version Options", key);
+            }
+            catch
+            {
+                
+
+            }
+
+
+            return returnVal;
+        }
+
+        public static void SetBooleanValue(bool value, string key)
+        {         
             SettingsStore.SetBoolean("Version Options", key, value);
         }
+
+        public static void SetStreamValue(MemoryStream value, string key)
+        {
+            SettingsStore.SetMemoryStream("Version Options", key, value);
+        }
+
+
     }
 }

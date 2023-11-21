@@ -301,8 +301,8 @@ namespace DSoft.VersionChanger.Data
         {
             get
             {
-                if (_fileVersion == null) 
-                    _assemblyVersion = new Version("1, 0, 0, 0");
+                if (_fileVersion == null)
+                    _fileVersion = new Version("1, 0, 0, 0");
 
                 return _fileVersion;
             }

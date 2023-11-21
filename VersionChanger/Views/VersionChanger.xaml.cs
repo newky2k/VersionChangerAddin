@@ -168,5 +168,10 @@ namespace DSoft.VersionChanger.Views
             hdrFileVersion.Visibility = _viewModel.SeparateVersions ? Visibility.Visible : Visibility.Hidden;
 
         }
-	}
+
+        private void OnClosing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            _viewModel.SaveProjectSelection();
+        }
+    }
 }

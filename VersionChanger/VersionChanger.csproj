@@ -83,6 +83,7 @@
     <Compile Include="Data\UWPVersion.cs" />
     <Compile Include="Enums\AppType.cs" />
     <Compile Include="Enums\plistType.cs" />
+    <Compile Include="Extensions\DictionaryExtensions.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="Extensions\VersionExtensions.cs" />
     <Compile Include="GlobalSuppressions.cs" />

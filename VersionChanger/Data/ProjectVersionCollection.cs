@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Runtime.Remoting;
 
@@ -8,6 +10,8 @@ namespace DSoft.VersionChanger.Data
 {
 	public class ProjectVersionCollection : ObservableCollection<ProjectVersion>
 	{
+		public event EventHandler<bool> SelectionStateChanged = delegate { };
+
 		public bool HasAndroid
 		{
 			get;
@@ -86,7 +90,8 @@ namespace DSoft.VersionChanger.Data
 
 		public ProjectVersionCollection()
 		{
-		}
+
+        }
 
         internal void UpdateState(Dictionary<string, bool> dict)
         {
@@ -97,6 +102,20 @@ namespace DSoft.VersionChanger.Data
 					item.Update = dict[item.Name];
 				}
 			}
+        }
+
+		public void WireUpEvents()
+		{
+            foreach (INotifyPropertyChanged item in Items)
+                item.PropertyChanged += OnItemPropertyChanged;
+        }
+
+        private void OnItemPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName.Equals(nameof(ProjectVersion.Update)))
+            {
+				SelectionStateChanged(sender, true);
+            }
         }
     }
 }

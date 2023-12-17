@@ -169,9 +169,17 @@ namespace DSoft.VersionChanger.Views
 
         }
 
-        private void OnClosing(object sender, System.ComponentModel.CancelEventArgs e)
+        private async void OnClosing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            _viewModel.SaveProjectSelection();
+            if (!_viewModel.DisableSelectionStorage)
+            {
+                await Task.Run(() =>
+                {
+                    _viewModel.SaveProjectSelection();
+                });
+            }
+
         }
+
     }
 }

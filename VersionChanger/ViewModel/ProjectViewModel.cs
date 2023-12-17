@@ -681,6 +681,8 @@ namespace DSoft.VersionChanger.ViewModel
 
                 LoadAssFileVersion();
 
+                var selectionStateChanged = false;
+
                 if (!DisableSelectionStorage)
                 {
                     try
@@ -691,7 +693,8 @@ namespace DSoft.VersionChanger.ViewModel
                         {
                             var dict = stateStream.Deserialize();
 
-                            Items.UpdateState(dict);
+                            //selection state will change if there are new projects that haven't been stored before
+                            selectionStateChanged = Items.UpdateState(dict);
 
                         }
                     }
@@ -703,7 +706,7 @@ namespace DSoft.VersionChanger.ViewModel
 
                 Items.WireUpEvents();
                 Items.SelectionStateChanged += OnItemSelectionStateUpdated;
-                _selectionStateHasChanged = false;
+                _selectionStateHasChanged = selectionStateChanged;
                 IsLoaded = true;
                 LoadingProjectsText = "Preparing....";
                 CurrentProjectName = string.Empty;

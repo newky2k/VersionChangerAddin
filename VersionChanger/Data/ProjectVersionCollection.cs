@@ -93,15 +93,23 @@ namespace DSoft.VersionChanger.Data
 
         }
 
-        internal void UpdateState(Dictionary<string, bool> dict)
+        internal bool UpdateState(Dictionary<string, bool> dict)
         {
+			var result = false;
+
 			foreach (var item in Items)
 			{
 				if (dict.ContainsKey(item.Name))
 				{
 					item.Update = dict[item.Name];
 				}
+				else
+				{
+					result = true;
+				}
 			}
+			
+			return result;
         }
 
 		public void WireUpEvents()

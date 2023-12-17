@@ -35,6 +35,7 @@ namespace DSoft.VersionChanger.ViewModel
         private bool _updateNuget;
         private bool _showUnloadedWarning;
         private List<FailedProject> _failedProjects;
+        private bool _selectionStateHasChanged;
 
         private string _assemblyMajor;
         private string _assemblyRevision;
@@ -53,6 +54,7 @@ namespace DSoft.VersionChanger.ViewModel
         private int _currentProject;
         private string _currentProjectName;
         private string _workingText = "Loading...";
+        private bool _disableSelectionStorage;
         #endregion
 
         public event EventHandler LoadingProgressUpdated = delegate { };
@@ -511,6 +513,17 @@ namespace DSoft.VersionChanger.ViewModel
             }
         }
 
+        public bool DisableSelectionStorage
+        {
+            get { return _disableSelectionStorage; }
+            set
+            {
+                _disableSelectionStorage = value;
+                SettingsControl.SetBooleanValue(value, "DisableSelectionStorage");
+                PropertyDidChange("DisableSelectionStorage");
+            }
+        }
+
         public bool UpdateAppDisplayVersion
         {
             get { return _versionOptions.UpdateAppDisplayVersion; }
@@ -590,6 +603,7 @@ namespace DSoft.VersionChanger.ViewModel
             _forceSemVer = SettingsControl.GetBooleanValue("ForceSemVer");
             _updateNuget = SettingsControl.GetBooleanValue("UpdateNuget");
             _versionOptions.EnableRevision = SettingsControl.GetBooleanValue("EnableRevision", true);
+            _disableSelectionStorage = SettingsControl.GetBooleanValue("DisableSelectionStorage", false);
 
             if (_forceSemVer == true)
             {
@@ -663,30 +677,36 @@ namespace DSoft.VersionChanger.ViewModel
                     }
                 }
 
-
                 LoadAssVersion();
 
                 LoadAssFileVersion();
 
+                var selectionStateChanged = false;
 
-
-                try
+                if (!DisableSelectionStorage)
                 {
-                    var stateStream = SettingsControl.GetStreamValue("ProjectState");
-
-                    if (stateStream != null && stateStream.Length > 0)
+                    try
                     {
-                        var dict = stateStream.Deserialize();
+                        var stateStream = SettingsControl.GetStreamValue("ProjectState");
 
-                        Items.UpdateState(dict);
+                        if (stateStream != null && stateStream.Length > 0)
+                        {
+                            var dict = stateStream.Deserialize();
 
+                            //selection state will change if there are new projects that haven't been stored before
+                            selectionStateChanged = Items.UpdateState(dict);
+
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        //unable to reload the project state
                     }
                 }
-                catch (Exception ex)
-                {
-                    //unable to relaod the project state
-                }
 
+                Items.WireUpEvents();
+                Items.SelectionStateChanged += OnItemSelectionStateUpdated;
+                _selectionStateHasChanged = selectionStateChanged;
                 IsLoaded = true;
                 LoadingProjectsText = "Preparing....";
                 CurrentProjectName = string.Empty;
@@ -697,6 +717,11 @@ namespace DSoft.VersionChanger.ViewModel
                 System.Windows.MessageBox.Show(ex.Message, "Error loading projects");
 			}
 
+        }
+
+        private void OnItemSelectionStateUpdated(object sender, bool e)
+        {
+            _selectionStateHasChanged = true;
         }
 
         public void ProcessUpdates()
@@ -971,11 +996,15 @@ namespace DSoft.VersionChanger.ViewModel
 
         public void SaveProjectSelection()
         {
-            //store the selection state of the projects
-            var stateDict = Items.StateDictionary;
+
+            if (!_selectionStateHasChanged)
+                return;
 
             try
             {
+                //store the selection state of the projects
+                var stateDict = Items.StateDictionary;
+
                 var stream = new MemoryStream();
 
                 stateDict.Serialize(stream);

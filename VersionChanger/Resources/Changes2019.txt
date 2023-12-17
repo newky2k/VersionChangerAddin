@@ -1,4 +1,7 @@
-﻿Changes in 4.1.2
+﻿﻿Changes in 4.1.3
+  - Added ability to disable storing of the project selection state(for when it is causing a crash)
+  - Updated the logic for storing of the project selection state to make it more stable and efficient(will now only save when changes to the selections have been made)
+Changes in 4.1.2
   - Added remembering of the project selection
   - Fixed issue with file Revision when using separate versions and revision is disabled
   - Removed support for VS 2017

@@ -173,7 +173,7 @@ namespace DSoft.VersionChanger.Views
         {
             if (!_viewModel.DisableSelectionStorage)
             {
-                await Task.Run(() =>
+                await System.Threading.Tasks.Task.Run(() =>
                 {
                     _viewModel.SaveProjectSelection();
                 });

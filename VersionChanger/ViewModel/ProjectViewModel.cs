@@ -55,6 +55,7 @@ namespace DSoft.VersionChanger.ViewModel
         private string _currentProjectName;
         private string _workingText = "Loading...";
         private bool _disableSelectionStorage;
+        private bool _assemblyFileInfo_AddSuffix;
         #endregion
 
         public event EventHandler LoadingProgressUpdated = delegate { };
@@ -292,11 +293,13 @@ namespace DSoft.VersionChanger.ViewModel
 
                 if (_forceSemVer == true)
                     EnableRevision = false;
+                else AssemblyFileInfo_AddSuffix = false;
 
                 PropertyDidChange("ForceSemVer");
                 PropertyDidChange("ShowRevision");
                 PropertyDidChange("ShowSemVer");
                 PropertyDidChange("EnableRevisionEnabled");
+                PropertyDidChange("AssemblyFileInfo_AddSuffix");
             }
         }
 
@@ -524,6 +527,17 @@ namespace DSoft.VersionChanger.ViewModel
             }
         }
 
+        public bool AssemblyFileInfo_AddSuffix
+        {
+            get { return _assemblyFileInfo_AddSuffix; }
+            set
+            {
+                _assemblyFileInfo_AddSuffix = value;
+                SettingsControl.SetBooleanValue(value, "AssemblyFileInfo_AddSuffix");
+                PropertyDidChange("AssemblyFileInfo_AddSuffix");
+            }
+        }
+
         public bool UpdateAppDisplayVersion
         {
             get { return _versionOptions.UpdateAppDisplayVersion; }
@@ -604,10 +618,15 @@ namespace DSoft.VersionChanger.ViewModel
             _updateNuget = SettingsControl.GetBooleanValue("UpdateNuget");
             _versionOptions.EnableRevision = SettingsControl.GetBooleanValue("EnableRevision", true);
             _disableSelectionStorage = SettingsControl.GetBooleanValue("DisableSelectionStorage", false);
+            _assemblyFileInfo_AddSuffix = SettingsControl.GetBooleanValue("AssemblyFileInfo_AddSuffix", false);
 
             if (_forceSemVer == true)
             {
                 _versionOptions.EnableRevision = false;
+            }
+            else
+            {
+                _assemblyFileInfo_AddSuffix = false;
             }
 
             _versionOptions.UpdateAssemblyVersion = SettingsControl.GetBooleanValue("UpdateAssemblyVersion", true);
@@ -788,7 +807,7 @@ namespace DSoft.VersionChanger.ViewModel
                             }
                             else
                             {
-                                solutionProcessor.UpdateFrameworkProject(ver.ProjectItem, _versionOptions, newVersion, fileVersion, _forceSemVer ? preRelease : null);
+                                solutionProcessor.UpdateFrameworkProject(ver.ProjectItem, _versionOptions, newVersion, fileVersion, _forceSemVer ? preRelease : null, _assemblyFileInfo_AddSuffix);
                             }
 
 

@@ -367,7 +367,7 @@ namespace DSoft.VersionChanger.Data
         /// <param name="item">The item.</param>
         /// <param name="newAssemblyVersion">The new assembly version.</param>
         /// <param name="newFileVersion">The new file version.</param>
-        public void UpdateFrameworkProject(ProjectItem item, AssemblyVersionOptions versionOptions, Version newAssemblyVersion, Version newFileVersion = null, string versionSuffix = null)
+        public void UpdateFrameworkProject(ProjectItem item, AssemblyVersionOptions versionOptions, Version newAssemblyVersion, Version newFileVersion = null, string versionSuffix = null, bool assemblyFileInfo_AddSuffix = false)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
@@ -451,8 +451,12 @@ namespace DSoft.VersionChanger.Data
                             int locationEnd = remaining.IndexOf("\"");
                             string end = remaining.Substring(locationEnd);
 
-
-                            var newFileVersionValue = versionOptions.CalculateVersion(newFileVersion);
+                            string newFileVersionValue;
+                            if (assemblyFileInfo_AddSuffix == true)
+                            {
+                                newFileVersionValue = versionOptions.CalculateVersion(newFileVersion, versionSuffix);
+                            }
+                            else newFileVersionValue = versionOptions.CalculateVersion(newFileVersion);
 
                             var newLine = string.Format("{0}{1}{2}", firstBit, newFileVersionValue.ToString(), end);
 

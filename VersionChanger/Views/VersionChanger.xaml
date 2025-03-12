@@ -267,10 +267,11 @@
                                     <StackPanel>
                                         <CheckBox Margin="5,5,0,5" IsChecked="{Binding UpdateClickOnce}" Content="Update ClickOnce" ToolTip="Update clickonce version numbers"/>
                                         <CheckBox Margin="5,0,0,5" IsChecked="{Binding SeparateVersions}" Content="Use seperate versions" Checked="OnUseSeperateVersionsChanged" Unchecked="OnUseSeperateVersionsChanged" ToolTip="Use different assembly and file versions"/>
-                                        <CheckBox Margin="5,0,0,10" IsChecked="{Binding ForceSemVer}" Checked="OnUseSemVerChecked" Unchecked="OnUseSemVerChecked" Content="Use SemVer 2.0" ToolTip="Will use Major, Minor, Build versions only for Assembly and File version. Will update nuget version for new style csproj files. Disbales 'Enable Revision'"/>
+                                        <CheckBox Margin="5,0,0,10" IsChecked="{Binding ForceSemVer}" Checked="OnUseSemVerChecked" Unchecked="OnUseSemVerChecked" Content="Use SemVer 2.0" ToolTip="Will use Major, Minor, Build versions only for Assembly and File version. Will update nuget version for new style csproj files. Disables 'Enable Revision'. Enables 'Suffix in file version'"/>
                                     </StackPanel>
                                     <StackPanel Grid.Column="1" HorizontalAlignment="Right">
                                         <CheckBox Margin="0,5,5,5" IsChecked="{Binding DisableSelectionStorage}" Content="Disable saving selection state" ToolTip="Disable storing selection state.  Use this if there are any crashes when closing the Version Changer window"/>
+                                        <CheckBox Margin="0,5,5,5" IsChecked="{Binding AssemblyFileInfo_AddSuffix}" Content="Suffix in AssemblyFileVersion" ToolTip="Adds version suffix to AssemblyFileInfo property (.NET Framework)" IsEnabled="{Binding ForceSemVer}" />
                                     </StackPanel>
                                     <StackPanel Grid.Column="2" HorizontalAlignment="Right">
                                         <CheckBox Margin="0,5,5,5" IsChecked="{Binding EnableRevision}" Content="Enable Revision" IsEnabled="{Binding EnableRevisionEnabled}" ToolTip="Enable revision version field"/>

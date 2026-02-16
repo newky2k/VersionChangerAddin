@@ -28,7 +28,6 @@
     <Grid>
         <Grid.Resources>
             <BooleanToVisibilityConverter x:Key="booleanToVisibilityConverter" />
-            <SolidColorBrush x:Key="AccentBackground" Color="#CC33B1B2" />
         </Grid.Resources>
         <Grid.RowDefinitions>
             <RowDefinition Height ="Auto"/>

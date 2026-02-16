@@ -5,6 +5,9 @@
     <ResourceDictionary.MergedDictionaries>
         
     </ResourceDictionary.MergedDictionaries>
+
+    <SolidColorBrush x:Key="AccentBackground" Color="#CC33B1B2" />
+    
     <!--Base style for title bar buttons-->
     <Style x:Key="CaptionButtonStyle" TargetType="Button">
         <Setter Property="Template">
@@ -41,6 +44,75 @@
 
     <Style TargetType="GroupBox">
         <Setter Property="Foreground" Value="{DynamicResource {x:Static vsshell:VsBrushes.CaptionTextKey}}" />
+    </Style>
+
+    
+
+    <Style TargetType="DataGrid">
+        <!-- Make the border and grid lines a little less imposing -->
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderBrush" Value="#DDDDDD" />
+        <Setter Property="HorizontalGridLinesBrush" Value="#DDDDDD" />
+        <Setter Property="VerticalGridLinesBrush" Value="#DDDDDD" />
+
+        <Setter Property="RowStyle">
+            <Setter.Value>
+                <Style TargetType="DataGridRow">
+                    <Style.Triggers>
+                        <!-- Highlight a grid row as the mouse passes over -->
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <!--<Setter Property="Background" Value="LightCyan" />-->
+                        </Trigger>
+                    </Style.Triggers>
+                    <Setter Property="Background" Value="Transparent" />
+                </Style>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="CellStyle">
+            <Setter.Value>
+                <Style TargetType="DataGridCell">
+                    <Style.Triggers>
+                        <!-- Highlight selected rows -->
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter Property="Background" Value="{StaticResource AccentBackground}" />
+                            <Setter Property="BorderBrush" Value="Transparent" />
+                            <Setter Property="Foreground" Value="Black" />
+                        </Trigger>
+                        <Trigger Property="IsFocused" Value="True">
+                            <Setter Property="Background" Value="{StaticResource AccentBackground}" />
+                            <Setter Property="BorderBrush" Value="Black" />
+                            <Setter Property="BorderThickness" Value="1"/>
+                            <Setter Property="Foreground" Value="Black" />
+                        </Trigger>
+                    </Style.Triggers>
+                    <!-- Add some padding around the contents of a cell -->
+                    <Setter Property="Foreground" Value="{DynamicResource {x:Static vsshell:VsBrushes.CaptionTextKey}}" />
+                    <Setter Property="Background" Value="Transparent" />
+                    <Setter Property="Padding" Value="4,3,4,3" />
+                    <Setter Property="BorderBrush" Value="Transparent"/>
+                    <Setter Property="BorderThickness" Value="1"/>
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="DataGridCell">
+                                <Border Padding="{TemplateBinding Padding}" 
+                                            BorderBrush="{TemplateBinding BorderBrush}"
+                                            BorderThickness="{TemplateBinding BorderThickness}"
+                                            Background="{TemplateBinding Background}">
+                                    <ContentPresenter />
+                                </Border>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                    <Setter Property="FocusVisualStyle">
+                        <Setter.Value>
+                            <Style TargetType="Control">
+                                <Setter Property="BorderBrush" Value="Transparent" />
+                            </Style>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </Setter.Value>
+        </Setter>
     </Style>
 
 </ResourceDictionary>

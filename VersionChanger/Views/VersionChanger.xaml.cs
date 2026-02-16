@@ -1,5 +1,4 @@
-﻿using ControlzEx.Theming;
-using DSoft.VersionChanger.ViewModel;
+﻿using DSoft.VersionChanger.ViewModel;
 using EnvDTE;
 using Microsoft.VisualStudio.PlatformUI;
 using Microsoft.VisualStudio.Shell;
@@ -40,24 +39,6 @@ namespace DSoft.VersionChanger.Views
             OnUseSemVerChecked(this, null);
             OnUseSeperateVersionsChanged(this, null);
 
-            var backColor = VSColorTheme.GetThemedColor(EnvironmentColors.ToolWindowBackgroundColorKey);
-  
-            if (backColor.R * 0.2126 + backColor.G * 0.7152 + backColor.B * 0.0722 < 255 / 2)
-            {
-                // dark color
-                ThemeManager.Current.ChangeTheme(this, "Dark.Green");
-
-                var backBrush = new SolidColorBrush(Color.FromArgb(backColor.A, backColor.R, backColor.G, backColor.B));
-
-                this.Background = backBrush;
-            }
-            else
-            {
-                // light color
-                ThemeManager.Current.ChangeTheme(this, "Light.Green");
-
-                this.Background = Brushes.WhiteSmoke;
-            }  
         }
 
         private void CommandBinding_CanExecute(object sender, CanExecuteRoutedEventArgs e)

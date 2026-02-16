@@ -1,20 +1,8 @@
 ﻿using System;
-using System.ComponentModel.Design;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
-using System.IO;
-using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading;
-using System.Threading.Tasks;
-using System.Windows;
-using MahApps.Metro;
-using Microsoft.VisualStudio;
-using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.Shell;
-using Microsoft.VisualStudio.Shell.Interop;
-using Microsoft.Win32;
 using Task = System.Threading.Tasks.Task;
 
 namespace DSoft.VersionChanger
@@ -72,13 +60,13 @@ namespace DSoft.VersionChanger
         {
             try
             {
-                var tsk = Assembly.GetAssembly(typeof(VersionChangerPackage));
+                //var tsk = Assembly.GetAssembly(typeof(VersionChangerPackage));
 
-                var location = Path.GetDirectoryName(tsk.Location);
+                //var location = Path.GetDirectoryName(tsk.Location);
 
-                var mahApps = Path.Combine(location, "MahApps.Metro.dll");
+                //var mahApps = Path.Combine(location, "MahApps.Metro.dll");
 
-                Assembly.LoadFrom(mahApps);
+                //Assembly.LoadFrom(mahApps);
             }
             catch (Exception)
             {

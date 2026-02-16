@@ -1,12 +1,12 @@
 ﻿using System;
 using System.ComponentModel.Design;
 using System.Globalization;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using DSoft.VersionChanger.Controls;
 using EnvDTE;
-using MahApps.Metro;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Shell.Settings;
@@ -118,6 +118,14 @@ namespace DSoft.VersionChanger
             }
             catch (Exception ex)
             {
+                var message = ex.Message + Environment.NewLine;
+
+                message += ex.StackTrace + Environment.NewLine;
+
+                message += ex.Source + Environment.NewLine;
+
+                File.WriteAllText("C:/Temp/VSLog.txt", message);
+
                 VsShellUtilities.ShowMessageBox(
                 this.package,
                 ex.Message,
